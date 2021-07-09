@@ -10,6 +10,12 @@
 namespace wtf {
 class MessageLoop {
 public:
+    static void EnsureInitializedForCurrentThread();
+
+    static bool IsInitializedForCurrentThread();
+
+    static TaskQueueId GetCurrentTaskQueueId();
+
     static MessageLoop& GetCurrent();
 
     void Run();
@@ -22,22 +28,10 @@ public:
 
     wtf::TaskRunner* GetTaskRunner() const;
 
-    // Exposed for the embedder shell which allows clients to poll for events
-    // instead of dedicating a thread to the message loop.
     void RunExpiredTasksNow();
-
-    static void EnsureInitializedForCurrentThread();
-
-    /// Returns true if \p EnsureInitializedForCurrentThread has been called on
-    /// this thread already.
-    static bool IsInitializedForCurrentThread();
 
     ~MessageLoop() {};
 
-    /// Gets the unique identifier for the TaskQueue associated with the current
-    /// thread.
-    /// \see wtf::MessageLoopTaskQueues
-    static TaskQueueId GetCurrentTaskQueueId();
 
 private:
     friend class TaskRunner;

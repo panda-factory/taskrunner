@@ -11,7 +11,6 @@ WTF_THREAD_LOCAL std::unique_ptr<MessageLoop> tls_message_loop;
 
 void MessageLoop::EnsureInitializedForCurrentThread() {
     if (tls_message_loop.get() != nullptr) {
-        // Already initialized.
         return;
     }
     tls_message_loop.reset(new MessageLoop());

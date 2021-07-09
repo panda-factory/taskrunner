@@ -11,15 +11,7 @@ namespace wtf {
 
 std::unique_ptr<MessageLoopImpl> MessageLoopImpl::Create()
 {
-#if OS_MACOSX
-    return wtf::MakeRefCounted<MessageLoopDarwin>();
-#elif OS_ANDROID
-    return wtf::MakeRefCounted<MessageLoopAndroid>();
-#elif OS_FUCHSIA
-    return wtf::MakeRefCounted<MessageLoopFuchsia>();
-#elif OS_LINUX
-    return wtf::MakeRefCounted<MessageLoopLinux>();
-#elif OS_WIN
+#if OS_WIN
     return std::make_unique<MessageLoopWin>();
 #else
     return nullptr;
