@@ -1,5 +1,5 @@
 //
-// Created by admin on 2021-07-02.
+// Created by guozhenxiong on 2021-07-02.
 //
 
 #include "thread.h"
@@ -83,7 +83,7 @@ void Thread::SetCurrentThreadName(const std::string& name) {
 #elif defined(OS_FUCHSIA)
     zx::thread::self()->set_property(ZX_PROP_NAME, name.c_str(), name.size());
 #else
-  FML_DLOG(INFO) << "Could not set the thread name to '" << name
+  WTF_DLOG(INFO) << "Could not set the thread name to '" << name
                  << "' on this platform.";
 #endif
 }

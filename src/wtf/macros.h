@@ -1,9 +1,9 @@
 //
-// Created by admin on 2021/1/17.
+// Created by guozhenxiong on 2021/1/17.
 //
 
-#ifndef TEST_MACROS_H
-#define TEST_MACROS_H
+#ifndef TASKRUNNER_MACROS_H
+#define TASKRUNNER_MACROS_H
 
 #define WTF_FWD(...) ::std::forward<decltype(__VA_ARGS__)>(__VA_ARGS__)
 
@@ -34,4 +34,4 @@
 #define WTF_DISALLOW_IMPLICIT_CONSTRUCTORS(TypeName) \
   TypeName() = delete;                               \
   WTF_DISALLOW_COPY_ASSIGN_AND_MOVE(TypeName)
-#endif //TEST_MACROS_H
+#endif //TASKRUNNER_MACROS_H

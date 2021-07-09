@@ -1,9 +1,9 @@
 //
-// Created by admin on 2021-07-02.
+// Created by guozhenxiong on 2021-07-02.
 //
 
-#ifndef TEST_THREAD_H
-#define TEST_THREAD_H
+#ifndef TASKRUNNER_THREAD_H
+#define TASKRUNNER_THREAD_H
 
 #include <atomic>
 #include <memory>
@@ -35,4 +35,4 @@ private:
 };
 } // namespace wtf
 
-#endif //TEST_THREAD_H
+#endif //TASKRUNNER_THREAD_H

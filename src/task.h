@@ -1,9 +1,9 @@
 //
-// Created by admin on 2021-07-02.
+// Created by guozhenxiong on 2021-07-02.
 //
 
-#ifndef TEST_TASK_H
-#define TEST_TASK_H
+#ifndef TASKRUNNER_TASK_H
+#define TASKRUNNER_TASK_H
 
 #include <functional>
 
@@ -13,4 +13,4 @@ using Task = std::function<void ()>;
 
 } // namespace wtf
 
-#endif //TEST_TASK_H
+#endif //TASKRUNNER_TASK_H

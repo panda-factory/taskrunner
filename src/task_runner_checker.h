@@ -1,9 +1,9 @@
 //
-// Created by admin on 2021-07-03.
+// Created by guozhenxiong on 2021-07-03.
 //
 
-#ifndef TEST_TASK_RUNNER_CHECKER_H
-#define TEST_TASK_RUNNER_CHECKER_H
+#ifndef TASKRUNNER_TASK_RUNNER_CHECKER_H
+#define TASKRUNNER_TASK_RUNNER_CHECKER_H
 
 #include "task_queue_id.h"
 
@@ -28,4 +28,4 @@ private:
 };
 } // namespace wtf
 
-#endif //TEST_TASK_RUNNER_CHECKER_H
+#endif //TASKRUNNER_TASK_RUNNER_CHECKER_H
