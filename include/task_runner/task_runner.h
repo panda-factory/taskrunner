@@ -7,7 +7,6 @@
 
 #include <functional>
 
-#include "time_point//time_point.h"
 #include "wtf/macros.h"
 #include "task_queue_id.h"
 #include "message_loop_impl.h"
@@ -23,12 +22,11 @@ public:
     static void RunNowOrPostTask(wtf::TaskRunner* runner,
                                  const wtf::Task& task);
 
-    virtual void PostTask(const wtf::Task& task) override;
+    void PostTask(const wtf::Task& task) override;
 
-    virtual void PostTaskForTime(const wtf::Task& task,
-                                 wtf::TimePoint target_time);
+    void PostTaskForTime(const wtf::Task& task, const std::chrono::steady_clock::time_point& target_time);
 
-    virtual void PostDelayedTask(const wtf::Task& task, wtf::TimeDelta delay);
+    void PostDelayedTask(const wtf::Task& task, const std::chrono::milliseconds& delay);
 
     virtual bool RunsTasksOnCurrentThread();
 
@@ -43,7 +41,9 @@ protected:
 private:
     MessageLoopImpl* loop_;
 
-    WTF_DISALLOW_COPY_AND_ASSIGN(TaskRunner);
+    TaskRunner(const TaskRunner&) = delete;
+
+    TaskRunner& operator=(const TaskRunner&) = delete;
 };
 } // namespace wtf
 

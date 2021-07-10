@@ -23,14 +23,14 @@ void MessageLoopWin::Run() {
 
 void MessageLoopWin::Terminate() {
     running_ = false;
-    WakeUp(wtf::TimePoint::Now());
+    WakeUp(std::chrono::steady_clock::now());
 }
 
-void MessageLoopWin::WakeUp(wtf::TimePoint time_point) {
+void MessageLoopWin::WakeUp(const std::chrono::steady_clock::time_point& time_point) {
     LARGE_INTEGER due_time = {0};
-    wtf::TimePoint now = wtf::TimePoint::Now();
+    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
     if (time_point > now) {
-        due_time.QuadPart = (time_point - now).ToNanoseconds() / -100;
+        due_time.QuadPart = std::chrono::nanoseconds(time_point - now).count() / -100;
     }
     WTF_CHECK(SetWaitableTimer(timer_, &due_time, 0, NULL, NULL, FALSE));
 }

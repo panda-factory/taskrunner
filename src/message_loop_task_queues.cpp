@@ -80,7 +80,7 @@ std::vector<wtf::Task> MessageLoopTaskQueues::GetObserversToNotify(
 }
 
 wtf::Task MessageLoopTaskQueues::GetNextTaskToRun(TaskQueueId queue_id,
-                                                  wtf::TimePoint from_time)
+                                                  const std::chrono::steady_clock::time_point& from_time)
 {
     std::lock_guard guard(queue_mutex_);
     if (!HasPendingTasksUnlocked(queue_id)) {
@@ -89,7 +89,7 @@ wtf::Task MessageLoopTaskQueues::GetNextTaskToRun(TaskQueueId queue_id,
     wtf::DelayedTask top_task = PeekNextTaskUnlocked(queue_id);
 
     if (!HasPendingTasksUnlocked(queue_id)) {
-        WakeUpUnlocked(queue_id, wtf::TimePoint::Max());
+        WakeUpUnlocked(queue_id, std::chrono::steady_clock::time_point::max());
     } else {
         WakeUpUnlocked(queue_id, GetNextWakeTimeUnlocked(queue_id));
     }
@@ -103,7 +103,7 @@ wtf::Task MessageLoopTaskQueues::GetNextTaskToRun(TaskQueueId queue_id,
     return invocation;
 }
 
-wtf::TimePoint MessageLoopTaskQueues::GetNextWakeTimeUnlocked(
+std::chrono::steady_clock::time_point MessageLoopTaskQueues::GetNextWakeTimeUnlocked(
         TaskQueueId queue_id) const
 {
     return PeekNextTaskUnlocked(queue_id).GetTargetTime();
@@ -141,7 +141,7 @@ wtf::DelayedTask MessageLoopTaskQueues::PeekNextTaskUnlocked(
 void MessageLoopTaskQueues::RegisterTask(
         TaskQueueId queue_id,
         const wtf::Task &task,
-        wtf::TimePoint target_time)
+        const std::chrono::steady_clock::time_point& target_time)
 {
     std::lock_guard guard(queue_mutex_);
     size_t order = order_++;
@@ -165,7 +165,7 @@ void MessageLoopTaskQueues::SetWakeable(TaskQueueId queue_id,
 }
 
 void MessageLoopTaskQueues::WakeUpUnlocked(TaskQueueId queue_id,
-                                           wtf::TimePoint time) const
+                                           const std::chrono::steady_clock::time_point& time) const
 {
     if (queue_entries_.at(queue_id)->wakeable) {
         queue_entries_.at(queue_id)->wakeable->WakeUp(time);

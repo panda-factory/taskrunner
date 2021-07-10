@@ -30,7 +30,7 @@ private:
 
     void Terminate() override;
 
-    void WakeUp(wtf::TimePoint time_point) override;
+    void WakeUp(const std::chrono::steady_clock::time_point& time_point) override;
 
     WTF_DISALLOW_COPY_AND_ASSIGN(MessageLoopWin);
 };

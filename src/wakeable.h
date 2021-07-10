@@ -5,7 +5,7 @@
 #ifndef TASKRUNNER_WAKEABLE_H
 #define TASKRUNNER_WAKEABLE_H
 
-#include "time_point/time_point.h"
+#include <chrono>
 
 namespace wtf {
 
@@ -13,7 +13,7 @@ class Wakeable {
 public:
     virtual ~Wakeable() {}
 
-    virtual void WakeUp(wtf::TimePoint time_point) = 0;
+    virtual void WakeUp(const std::chrono::steady_clock::time_point& time_point) = 0;
 };
 
 }  // namespace wtf

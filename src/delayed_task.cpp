@@ -7,7 +7,7 @@ namespace wtf {
 
 DelayedTask::DelayedTask(size_t order,
                          const wtf::Task& task,
-                         wtf::TimePoint target_time)
+                         const std::chrono::steady_clock::time_point& target_time)
         : order_(order),
           task_(task),
           target_time_(target_time) {}
@@ -16,7 +16,7 @@ const wtf::Task& DelayedTask::GetTask() const {
     return task_;
 }
 
-wtf::TimePoint DelayedTask::GetTargetTime() const {
+std::chrono::steady_clock::time_point DelayedTask::GetTargetTime() const {
     return target_time_;
 }
 

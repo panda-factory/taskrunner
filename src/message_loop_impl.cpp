@@ -68,7 +68,7 @@ void MessageLoopImpl::DoTerminate()
 void MessageLoopImpl::FlushTasks(FlushType type)
 {
 
-    const auto now = wtf::TimePoint::Now();
+    const auto now = std::chrono::steady_clock::now();
     wtf::Task invocation;
     do {
         invocation = task_queue_->GetNextTaskToRun(queue_id_, now);
@@ -88,7 +88,7 @@ void MessageLoopImpl::FlushTasks(FlushType type)
 }
 
 void MessageLoopImpl::PostTask(const wtf::Task &task,
-                               wtf::TimePoint target_time)
+                               const std::chrono::steady_clock::time_point& target_time)
 {
     WTF_DCHECK(task != nullptr);
     WTF_DCHECK(task != nullptr);

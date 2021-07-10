@@ -9,9 +9,8 @@
 #include <mutex>
 
 #include "task_queue_id.h"
-#include "task.h"
+#include "task_runner/task.h"
 #include "wakeable.h"
-#include "time_point/time_point.h"
 #include "wtf/macros.h"
 #include "delayed_task.h"
 
@@ -45,11 +44,11 @@ public:
 
     void RegisterTask(TaskQueueId queue_id,
                       const wtf::Task& task,
-                      wtf::TimePoint target_time);
+                      const std::chrono::steady_clock::time_point& target_time);
 
     bool HasPendingTasks(TaskQueueId queue_id) const;
 
-    wtf::Task GetNextTaskToRun(TaskQueueId queue_id, wtf::TimePoint from_time);
+    wtf::Task GetNextTaskToRun(TaskQueueId queue_id, const std::chrono::steady_clock::time_point& from_time);
 
     size_t GetNumPendingTasks(TaskQueueId queue_id) const;
 
@@ -82,13 +81,13 @@ private:
 
     ~MessageLoopTaskQueues();
 
-    void WakeUpUnlocked(TaskQueueId queue_id, wtf::TimePoint time) const;
+    void WakeUpUnlocked(TaskQueueId queue_id, const std::chrono::steady_clock::time_point& time) const;
 
     bool HasPendingTasksUnlocked(TaskQueueId queue_id) const;
 
     wtf::DelayedTask PeekNextTaskUnlocked(TaskQueueId owner) const;
 
-    wtf::TimePoint GetNextWakeTimeUnlocked(TaskQueueId queue_id) const;
+    std::chrono::steady_clock::time_point GetNextWakeTimeUnlocked(TaskQueueId queue_id) const;
 
     mutable std::mutex queue_mutex_;
     std::map<TaskQueueId, std::unique_ptr<TaskQueueEntry>> queue_entries_;

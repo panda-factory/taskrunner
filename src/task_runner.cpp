@@ -21,17 +21,17 @@ TaskQueueId TaskRunner::GetTaskQueueId() {
 }
 
 void TaskRunner::PostTask(const wtf::Task& task) {
-    loop_->PostTask(task, wtf::TimePoint::Now());
+    loop_->PostTask(task, std::chrono::steady_clock::now());
 }
 
 void TaskRunner::PostTaskForTime(const wtf::Task& task,
-                                 wtf::TimePoint target_time) {
+                                 const std::chrono::steady_clock::time_point& target_time) {
     loop_->PostTask(task, target_time);
 }
 
 void TaskRunner::PostDelayedTask(const wtf::Task& task,
-                                 wtf::TimeDelta delay) {
-    loop_->PostTask(task, wtf::TimePoint::Now() + delay);
+                                 const std::chrono::milliseconds& delay) {
+    loop_->PostTask(task, std::chrono::steady_clock::now() + delay);
 }
 
 bool TaskRunner::RunsTasksOnCurrentThread() {

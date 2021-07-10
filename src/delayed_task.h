@@ -6,9 +6,9 @@
 #define TASKRUNNER_DELAYED_TASK_H
 
 #include <queue>
+#include <chrono>
 
-#include "task.h"
-#include "time_point/time_point.h"
+#include "task_runner/task.h"
 
 namespace wtf {
 
@@ -16,7 +16,7 @@ class DelayedTask {
 public:
     DelayedTask(size_t order,
                 const wtf::Task& task,
-                wtf::TimePoint target_time);
+                const std::chrono::steady_clock::time_point& target_time);
 
     DelayedTask(const DelayedTask& other) = default;
 
@@ -24,14 +24,14 @@ public:
 
     const wtf::Task& GetTask() const;
 
-    wtf::TimePoint GetTargetTime() const;
+    std::chrono::steady_clock::time_point GetTargetTime() const;
 
     bool operator>(const DelayedTask& other) const;
 
 private:
     size_t order_;
     wtf::Task task_;
-    wtf::TimePoint target_time_;
+    std::chrono::steady_clock::time_point target_time_;
 
 };
 
