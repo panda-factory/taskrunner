@@ -2,3 +2,9 @@
 	path = third-party/googletest
 	url = https://github.com/google/googletest.git
 	branch = v1.10.x
+[submodule "third-party/logging"]
+	path = third-party/logging
+	url = https://github.com/panda-factory/logging.git
+[submodule "third-party/timepoint"]
+	path = third-party/timepoint
+	url = https://github.com/panda-factory/timepoint.git
