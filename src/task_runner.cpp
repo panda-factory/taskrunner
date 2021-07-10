@@ -20,16 +20,16 @@ TaskQueueId TaskRunner::GetTaskQueueId() {
     return loop_->GetTaskQueueId();
 }
 
-void TaskRunner::PostTask(const wtf::Task& task) {
+void TaskRunner::PostTask(const std::function<void ()>& task) {
     loop_->PostTask(task, std::chrono::steady_clock::now());
 }
 
-void TaskRunner::PostTaskForTime(const wtf::Task& task,
+void TaskRunner::PostTaskForTime(const std::function<void ()>& task,
                                  const std::chrono::steady_clock::time_point& target_time) {
     loop_->PostTask(task, target_time);
 }
 
-void TaskRunner::PostDelayedTask(const wtf::Task& task,
+void TaskRunner::PostDelayedTask(const std::function<void ()>& task,
                                  const std::chrono::milliseconds& delay) {
     loop_->PostTask(task, std::chrono::steady_clock::now() + delay);
 }

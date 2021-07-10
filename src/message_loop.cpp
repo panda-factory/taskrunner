@@ -27,7 +27,7 @@ MessageLoop::MessageLoop()
     WTF_CHECK(task_runner_ != nullptr);
 }
 
-void MessageLoop::AddTaskObserver(intptr_t key, const wtf::Task& callback) {
+void MessageLoop::AddTaskObserver(intptr_t key, const std::function<void ()>& callback) {
     loop_->AddTaskObserver(key, callback);
 }
 

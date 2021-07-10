@@ -9,16 +9,14 @@
 #include <mutex>
 
 #include "task_queue_id.h"
-#include "task_runner/task.h"
 #include "wakeable.h"
-#include "wtf/macros.h"
 #include "delayed_task.h"
 
 namespace wtf {
 
 class TaskQueueEntry {
 public:
-    using TaskObservers = std::map<intptr_t, wtf::Task>;
+    using TaskObservers = std::map<intptr_t, std::function<void ()>>;
     Wakeable* wakeable;
     TaskObservers task_observers;
     DelayedTaskQueue delayed_task_queue;
@@ -28,7 +26,10 @@ public:
     explicit TaskQueueEntry(TaskQueueId owner_of);
 
 private:
-    WTF_DISALLOW_COPY_ASSIGN_AND_MOVE(TaskQueueEntry);
+    TaskQueueEntry(const TaskQueueEntry&) = delete;
+    TaskQueueEntry(TaskQueueEntry&&) = delete;
+    TaskQueueEntry& operator=(const TaskQueueEntry&) = delete;
+    TaskQueueEntry& operator=(TaskQueueEntry&&) = delete;
 };
 
 class MessageLoopTaskQueues {
@@ -43,22 +44,22 @@ public:
     void DisposeTasks(TaskQueueId queue_id);
 
     void RegisterTask(TaskQueueId queue_id,
-                      const wtf::Task& task,
+                      const std::function<void ()>& task,
                       const std::chrono::steady_clock::time_point& target_time);
 
     bool HasPendingTasks(TaskQueueId queue_id) const;
 
-    wtf::Task GetNextTaskToRun(TaskQueueId queue_id, const std::chrono::steady_clock::time_point& from_time);
+    std::function<void ()> GetNextTaskToRun(TaskQueueId queue_id, const std::chrono::steady_clock::time_point& from_time);
 
     size_t GetNumPendingTasks(TaskQueueId queue_id) const;
 
     void AddTaskObserver(TaskQueueId queue_id,
                          intptr_t key,
-                         const wtf::Task& callback);
+                         const std::function<void ()>& callback);
 
     void RemoveTaskObserver(TaskQueueId queue_id, intptr_t key);
 
-    std::vector<wtf::Task> GetObserversToNotify(TaskQueueId queue_id) const;
+    std::vector<std::function<void ()>> GetObserversToNotify(TaskQueueId queue_id) const;
 
     void SetWakeable(TaskQueueId queue_id, wtf::Wakeable* wakeable);
 
@@ -96,7 +97,10 @@ private:
 
     std::atomic_int order_ = 0;
 
-    WTF_DISALLOW_COPY_ASSIGN_AND_MOVE(MessageLoopTaskQueues);
+    MessageLoopTaskQueues(const MessageLoopTaskQueues&) = delete;
+    MessageLoopTaskQueues(MessageLoopTaskQueues&&) = delete;
+    MessageLoopTaskQueues& operator=(const MessageLoopTaskQueues&) = delete;
+    MessageLoopTaskQueues& operator=(MessageLoopTaskQueues&&) = delete;
 
 };
 enum class FlushType {

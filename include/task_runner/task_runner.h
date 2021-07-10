@@ -7,26 +7,25 @@
 
 #include <functional>
 
-#include "wtf/macros.h"
 #include "task_queue_id.h"
 #include "message_loop_impl.h"
 namespace wtf {
 
 class BasicTaskRunner {
 public:
-    virtual void PostTask(const wtf::Task& task) = 0;
+    virtual void PostTask(const std::function<void ()>& task) = 0;
 };
 
 class TaskRunner : public BasicTaskRunner {
 public:
     static void RunNowOrPostTask(wtf::TaskRunner* runner,
-                                 const wtf::Task& task);
+                                 const std::function<void ()>& task);
 
-    void PostTask(const wtf::Task& task) override;
+    void PostTask(const std::function<void ()>& task) override;
 
-    void PostTaskForTime(const wtf::Task& task, const std::chrono::steady_clock::time_point& target_time);
+    void PostTaskForTime(const std::function<void ()>& task, const std::chrono::steady_clock::time_point& target_time);
 
-    void PostDelayedTask(const wtf::Task& task, const std::chrono::milliseconds& delay);
+    void PostDelayedTask(const std::function<void ()>& task, const std::chrono::milliseconds& delay);
 
     virtual bool RunsTasksOnCurrentThread();
 
@@ -45,6 +44,7 @@ private:
 
     TaskRunner& operator=(const TaskRunner&) = delete;
 };
+
 } // namespace wtf
 
 #endif //TASKRUNNER_TASK_RUNNER_H

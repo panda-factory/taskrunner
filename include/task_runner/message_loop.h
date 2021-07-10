@@ -22,7 +22,7 @@ public:
 
     void Terminate();
 
-    void AddTaskObserver(intptr_t key, const wtf::Task& callback);
+    void AddTaskObserver(intptr_t key, const std::function<void ()>& callback);
 
     void RemoveTaskObserver(intptr_t key);
 
@@ -44,7 +44,8 @@ private:
 
     MessageLoopImpl* GetLoopImpl() const;
 
-    WTF_DISALLOW_COPY_AND_ASSIGN(MessageLoop);
+    MessageLoop(const MessageLoop&) = delete;
+    MessageLoop& operator=(const MessageLoop&) = delete;
 
 };
 } // namespace wtf

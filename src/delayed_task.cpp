@@ -6,13 +6,13 @@
 namespace wtf {
 
 DelayedTask::DelayedTask(size_t order,
-                         const wtf::Task& task,
+                         const std::function<void ()>& task,
                          const std::chrono::steady_clock::time_point& target_time)
         : order_(order),
           task_(task),
           target_time_(target_time) {}
 
-const wtf::Task& DelayedTask::GetTask() const {
+const std::function<void ()>& DelayedTask::GetTask() const {
     return task_;
 }
 

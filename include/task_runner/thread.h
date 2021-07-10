@@ -30,7 +30,8 @@ private:
     wtf::TaskRunner* task_runner_;
     std::atomic_bool joined_;
 
-    WTF_DISALLOW_COPY_AND_ASSIGN(Thread);
+    Thread(const Thread&) = delete;
+    Thread& operator=(const Thread&) = delete;
 
 };
 } // namespace wtf

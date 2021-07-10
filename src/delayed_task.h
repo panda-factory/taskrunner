@@ -7,22 +7,21 @@
 
 #include <queue>
 #include <chrono>
-
-#include "task_runner/task.h"
+#include <functional>
 
 namespace wtf {
 
 class DelayedTask {
 public:
     DelayedTask(size_t order,
-                const wtf::Task& task,
+                const std::function<void ()>& task,
                 const std::chrono::steady_clock::time_point& target_time);
 
     DelayedTask(const DelayedTask& other) = default;
 
     ~DelayedTask() = default;
 
-    const wtf::Task& GetTask() const;
+    const std::function<void ()>& GetTask() const;
 
     std::chrono::steady_clock::time_point GetTargetTime() const;
 
@@ -30,7 +29,7 @@ public:
 
 private:
     size_t order_;
-    wtf::Task task_;
+    std::function<void ()> task_;
     std::chrono::steady_clock::time_point target_time_;
 
 };

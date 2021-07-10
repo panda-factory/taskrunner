@@ -32,7 +32,7 @@ MessageLoopImpl::~MessageLoopImpl()
 }
 
 void MessageLoopImpl::AddTaskObserver(intptr_t key,
-                                      const wtf::Task &callback)
+                                      const std::function<void ()> &callback)
 {
     WTF_DCHECK(callback != nullptr);
     WTF_DCHECK(MessageLoop::GetCurrent().GetLoopImpl() == this)
@@ -69,14 +69,14 @@ void MessageLoopImpl::FlushTasks(FlushType type)
 {
 
     const auto now = std::chrono::steady_clock::now();
-    wtf::Task invocation;
+    std::function<void ()> invocation;
     do {
         invocation = task_queue_->GetNextTaskToRun(queue_id_, now);
         if (!invocation) {
             break;
         }
         invocation();
-        std::vector<wtf::Task> observers =
+        std::vector<std::function<void ()>> observers =
                 task_queue_->GetObserversToNotify(queue_id_);
         for (const auto &observer : observers) {
             observer();
@@ -87,7 +87,7 @@ void MessageLoopImpl::FlushTasks(FlushType type)
     } while (invocation);
 }
 
-void MessageLoopImpl::PostTask(const wtf::Task &task,
+void MessageLoopImpl::PostTask(const std::function<void ()> &task,
                                const std::chrono::steady_clock::time_point& target_time)
 {
     WTF_DCHECK(task != nullptr);

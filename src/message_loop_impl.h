@@ -5,11 +5,9 @@
 #ifndef TASKRUNNER_MESSAGE_LOOP_IMPL_H
 #define TASKRUNNER_MESSAGE_LOOP_IMPL_H
 
-#include "task_runner/task.h"
 #include "wakeable.h"
 #include "task_queue_id.h"
 #include "message_loop_task_queues.h"
-#include "wtf/macros.h"
 
 namespace wtf {
 
@@ -23,9 +21,9 @@ public:
 
     virtual void Terminate() = 0;
 
-    void PostTask(const wtf::Task& task, const std::chrono::steady_clock::time_point& target_time);
+    void PostTask(const std::function<void ()>& task, const std::chrono::steady_clock::time_point& target_time);
 
-    void AddTaskObserver(intptr_t key, const wtf::Task& callback);
+    void AddTaskObserver(intptr_t key, const std::function<void ()>& callback);
 
     void RemoveTaskObserver(intptr_t key);
 
@@ -53,7 +51,8 @@ private:
 
     void FlushTasks(FlushType type);
 
-    WTF_DISALLOW_COPY_AND_ASSIGN(MessageLoopImpl);
+    MessageLoopImpl(const MessageLoopImpl&) = delete;
+    MessageLoopImpl& operator=(const MessageLoopImpl&) = delete;
 
 };
 } // namespace wtf

@@ -7,7 +7,6 @@
 
 #include <memory>
 
-#include "wtf/macros.h"
 namespace wtf {
 
 #define WTF_THREAD_LOCAL static thread_local

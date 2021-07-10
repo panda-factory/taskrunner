@@ -5,6 +5,3 @@
 [submodule "third-party/logging"]
 	path = third-party/logging
 	url = https://github.com/panda-factory/logging.git
-[submodule "third-party/timepoint"]
-	path = third-party/timepoint
-	url = https://github.com/panda-factory/timepoint.git

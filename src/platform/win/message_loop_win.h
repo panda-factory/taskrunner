@@ -32,7 +32,8 @@ private:
 
     void WakeUp(const std::chrono::steady_clock::time_point& time_point) override;
 
-    WTF_DISALLOW_COPY_AND_ASSIGN(MessageLoopWin);
+    MessageLoopWin(const MessageLoopWin&) = delete;
+    MessageLoopWin& operator=(const MessageLoopWin&) = delete;
 };
 
 } // namespace wtf

@@ -32,7 +32,7 @@ MessageLoopTaskQueues *MessageLoopTaskQueues::GetInstance()
 
 void MessageLoopTaskQueues::AddTaskObserver(TaskQueueId queue_id,
                                             intptr_t key,
-                                            const wtf::Task &callback)
+                                            const std::function<void ()> &callback)
 {
     std::lock_guard guard(queue_mutex_);
     WTF_DCHECK(callback != nullptr) << "Observer callback must be non-null.";
@@ -66,11 +66,11 @@ void MessageLoopTaskQueues::DisposeTasks(TaskQueueId queue_id)
     queue_entry->delayed_task_queue = {};
 }
 
-std::vector<wtf::Task> MessageLoopTaskQueues::GetObserversToNotify(
+std::vector<std::function<void ()>> MessageLoopTaskQueues::GetObserversToNotify(
         TaskQueueId queue_id) const
 {
     std::lock_guard guard(queue_mutex_);
-    std::vector<wtf::Task> observers;
+    std::vector<std::function<void ()>> observers;
 
     for (const auto &observer : queue_entries_.at(queue_id)->task_observers) {
         observers.push_back(observer.second);
@@ -79,7 +79,7 @@ std::vector<wtf::Task> MessageLoopTaskQueues::GetObserversToNotify(
     return observers;
 }
 
-wtf::Task MessageLoopTaskQueues::GetNextTaskToRun(TaskQueueId queue_id,
+std::function<void ()> MessageLoopTaskQueues::GetNextTaskToRun(TaskQueueId queue_id,
                                                   const std::chrono::steady_clock::time_point& from_time)
 {
     std::lock_guard guard(queue_mutex_);
@@ -97,7 +97,7 @@ wtf::Task MessageLoopTaskQueues::GetNextTaskToRun(TaskQueueId queue_id,
     if (top_task.GetTargetTime() > from_time) {
         return nullptr;
     }
-    wtf::Task invocation = top_task.GetTask();
+    std::function<void ()> invocation = top_task.GetTask();
     queue_entries_.at(queue_id)
             ->delayed_task_queue.pop();
     return invocation;
@@ -140,7 +140,7 @@ wtf::DelayedTask MessageLoopTaskQueues::PeekNextTaskUnlocked(
 
 void MessageLoopTaskQueues::RegisterTask(
         TaskQueueId queue_id,
-        const wtf::Task &task,
+        const std::function<void ()> &task,
         const std::chrono::steady_clock::time_point& target_time)
 {
     std::lock_guard guard(queue_mutex_);
