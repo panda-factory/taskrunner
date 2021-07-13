@@ -8,7 +8,8 @@
 
 TEST(TaskRunner, CreateAndTerminate)
 {
-    //auto task_runner = wtf::TaskRunner::CreateTaskRunner("aaa");
+    auto task_runner = wtf::TaskRunner::CreateTaskRunner("aaa");
+    ASSERT_NE(task_runner.get(), nullptr);
 }
 
 TEST(TaskRunner, NonDelayedTasksAreRunInOrder)

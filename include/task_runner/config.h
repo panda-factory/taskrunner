@@ -5,7 +5,7 @@
 #ifndef TASKRUNNER_CONFIG_H
 #define TASKRUNNER_CONFIG_H
 
-#if !defined(STATIC_LIB)
+#if defined(STATIC_LIB)
 #define WTF_DLL
 #else
 #if !defined(USE_DLL)

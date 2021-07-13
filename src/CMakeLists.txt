@@ -1,4 +1,5 @@
 
+
 SET(TASK_RUNNER_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/delayed_task.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/message_loop.cpp
@@ -12,9 +13,18 @@ IF(WIN32)
         ${CMAKE_CURRENT_SOURCE_DIR}/platform/win/message_loop_win.cpp)
 ENDIF()
 
-ADD_LIBRARY(taskrunner STATIC ${TASK_RUNNER_SRC})
-TARGET_LINK_LIBRARIES(taskrunner PRIVATE logging timepoint sync)
-TARGET_INCLUDE_DIRECTORIES(taskrunner PRIVATE ${PROJECT_ROOT_PATH}/src)
-TARGET_INCLUDE_DIRECTORIES(taskrunner PRIVATE ${PROJECT_ROOT_PATH}/third-party/logging/include)
-TARGET_INCLUDE_DIRECTORIES(taskrunner PRIVATE ${PROJECT_ROOT_PATH}/third-party/timepoint/include)
+IF(STATIC_LIB)
+    ADD_LIBRARY(taskrunner STATIC ${TASK_RUNNER_SRC})
+    TARGET_LINK_LIBRARIES(taskrunner PRIVATE logging)
+    #TARGET_COMPILE_DEFINITIONS(taskrunner PRIVATE STATIC_LIB=1)
+ELSE()
+    ADD_LIBRARY(taskrunner SHARED ${TASK_RUNNER_SRC})
+    TARGET_LINK_LIBRARIES(taskrunner PUBLIC logging)
+ENDIF()
+
+if (WIN32)
+    TARGET_COMPILE_DEFINITIONS(taskrunner PRIVATE OS_WIN=1)
+endif()
+
+TARGET_INCLUDE_DIRECTORIES(taskrunner PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 TARGET_INCLUDE_DIRECTORIES(taskrunner PRIVATE ${PROJECT_ROOT_PATH}/third-party/logging/include)
