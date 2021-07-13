@@ -11,6 +11,7 @@
 #include "task_queue_id.h"
 #include "wakeable.h"
 #include "delayed_task.h"
+#include "macros.h"
 
 namespace wtf {
 
@@ -26,10 +27,8 @@ public:
     explicit TaskQueueEntry(TaskQueueId owner_of);
 
 private:
-    TaskQueueEntry(const TaskQueueEntry&) = delete;
-    TaskQueueEntry(TaskQueueEntry&&) = delete;
-    TaskQueueEntry& operator=(const TaskQueueEntry&) = delete;
-    TaskQueueEntry& operator=(TaskQueueEntry&&) = delete;
+
+    WTF_DISALLOW_COPY_ASSIGN_AND_MOVE(TaskQueueEntry);
 };
 
 class MessageLoopTaskQueues {
@@ -62,18 +61,6 @@ public:
     std::vector<std::function<void ()>> GetObserversToNotify(TaskQueueId queue_id) const;
 
     void SetWakeable(TaskQueueId queue_id, wtf::Wakeable* wakeable);
-
-    bool Merge(TaskQueueId owner, TaskQueueId subsumed);
-
-    bool Unmerge(TaskQueueId owner);
-
-    bool Owns(TaskQueueId owner, TaskQueueId subsumed) const;
-
-    TaskQueueId GetSubsumedTaskQueueId(TaskQueueId owner) const;
-
-    void PauseSecondarySource(TaskQueueId queue_id);
-
-    void ResumeSecondarySource(TaskQueueId queue_id);
 
 private:
     class MergedQueuesRunner;

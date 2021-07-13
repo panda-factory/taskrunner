@@ -9,10 +9,12 @@
 #include <chrono>
 #include <thread>
 
+#include "config.h"
+
 namespace wtf {
 class MessageLoopImpl;
 
-class TaskRunner {
+WTF_DLL class TaskRunner {
 public:
     static std::unique_ptr<TaskRunner> CreateTaskRunner(const std::string& task_name);
 
@@ -28,8 +30,6 @@ public:
 
     TaskRunner();
 
-    TaskRunner(wtf::MessageLoopImpl* loop);
-
     ~TaskRunner();
 
 protected:
@@ -42,6 +42,8 @@ private:
     std::unique_ptr<std::thread> thread_;
 
     std::atomic_bool joined_;
+
+    TaskRunner(wtf::MessageLoopImpl* loop);
 
     TaskRunner(const TaskRunner&) = delete;
 

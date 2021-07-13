@@ -121,14 +121,6 @@ bool MessageLoopTaskQueues::HasPendingTasksUnlocked(
     return !entry->delayed_task_queue.empty();
 }
 
-bool MessageLoopTaskQueues::Owns(TaskQueueId owner,
-                                 TaskQueueId subsumed) const
-{
-    std::lock_guard guard(queue_mutex_);
-    return owner != g_unmerged && subsumed != g_unmerged &&
-           subsumed == queue_entries_.at(owner)->owner_of;
-}
-
 wtf::DelayedTask MessageLoopTaskQueues::PeekNextTaskUnlocked(
         TaskQueueId owner) const
 {

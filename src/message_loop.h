@@ -8,6 +8,7 @@
 #include "task_runner/task_runner.h"
 #include "task_queue_id.h"
 #include "message_loop_impl.h"
+#include "macros.h"
 
 namespace wtf {
 class MessageLoop {
@@ -43,8 +44,7 @@ private:
 
     MessageLoopImpl* GetLoopImpl() const;
 
-    MessageLoop(const MessageLoop&) = delete;
-    MessageLoop& operator=(const MessageLoop&) = delete;
+    WTF_DISALLOW_COPY_AND_ASSIGN(MessageLoop);
 
 };
 } // namespace wtf

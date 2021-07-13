@@ -8,6 +8,7 @@
 #include "wakeable.h"
 #include "task_queue_id.h"
 #include "message_loop_task_queues.h"
+#include "macros.h"
 
 namespace wtf {
 
@@ -49,8 +50,7 @@ private:
 
     void FlushTasks(FlushType type);
 
-    MessageLoopImpl(const MessageLoopImpl&) = delete;
-    MessageLoopImpl& operator=(const MessageLoopImpl&) = delete;
+    WTF_DISALLOW_COPY_AND_ASSIGN(MessageLoopImpl);
 
 };
 } // namespace wtf
