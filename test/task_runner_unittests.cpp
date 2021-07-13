@@ -67,3 +67,24 @@ TEST(TaskRunner, DelayedTasksAtSameTimeAreRunInOrder)
     ASSERT_EQ(current, count);
     ASSERT_TRUE(terminated);
 }
+
+TEST(TaskRunner, SingleDelayedTaskByDuration)
+{
+    bool checked = false;
+    auto task_runner = wtf::TaskRunner::CreateTaskRunner();
+
+    auto begin = std::chrono::steady_clock::now();
+    task_runner->PostDelayedTask(
+            [begin, &checked, &task_runner]() {
+                auto delta = std::chrono::steady_clock::now() - begin;
+                auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(delta).count();
+                ASSERT_GE(ms, 5);
+                ASSERT_LE(ms, 7);
+                checked = true;
+                task_runner->Terminate();
+            },
+            std::chrono::milliseconds(5));
+
+    task_runner->Join();
+    ASSERT_TRUE(checked);
+}
