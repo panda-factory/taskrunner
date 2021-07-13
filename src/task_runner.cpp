@@ -74,6 +74,7 @@ TaskRunner::TaskRunner(wtf::MessageLoopImpl* loop)
 
 TaskRunner::~TaskRunner()
 {
+    Terminate();
     Join();
 }
 
@@ -82,7 +83,6 @@ void TaskRunner::Join() {
         return;
     }
     joined_ = true;
-    Terminate();
     thread_->join();
 }
 

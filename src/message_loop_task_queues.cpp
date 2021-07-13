@@ -141,7 +141,6 @@ void MessageLoopTaskQueues::RegisterTask(
     queue_entry->delayed_task_queue.push({order, task, target_time});
     TaskQueueId loop_to_wake = queue_id;
 
-    // This can happen when the secondary tasks are paused.
     if (HasPendingTasksUnlocked(loop_to_wake)) {
         WakeUpUnlocked(loop_to_wake, GetNextWakeTimeUnlocked(loop_to_wake));
     }

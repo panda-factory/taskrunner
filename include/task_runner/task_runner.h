@@ -16,7 +16,7 @@ class MessageLoopImpl;
 
 WTF_DLL class TaskRunner {
 public:
-    static std::unique_ptr<TaskRunner> CreateTaskRunner(const std::string& task_name);
+    static std::unique_ptr<TaskRunner> CreateTaskRunner(const std::string& task_name = "");
 
     void Join();
 
