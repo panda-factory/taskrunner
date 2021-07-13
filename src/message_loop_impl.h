@@ -38,8 +38,6 @@ protected:
 
     void RunExpiredTasksNow();
 
-    void RunSingleExpiredTaskNow();
-
 protected:
     MessageLoopImpl();
 

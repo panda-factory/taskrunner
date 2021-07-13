@@ -3,7 +3,7 @@
 //
 
 #include "message_loop_impl.h"
-#include "task_runner/message_loop.h"
+#include "message_loop.h"
 #include "platform/win/message_loop_win.h"
 #include "logging/logging.h"
 
@@ -103,11 +103,6 @@ void MessageLoopImpl::PostTask(const std::function<void ()> &task,
 void MessageLoopImpl::RunExpiredTasksNow()
 {
     FlushTasks(FlushType::All);
-}
-
-void MessageLoopImpl::RunSingleExpiredTaskNow()
-{
-    FlushTasks(FlushType::Single);
 }
 
 TaskQueueId MessageLoopImpl::GetTaskQueueId() const

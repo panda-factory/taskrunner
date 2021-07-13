@@ -2,9 +2,11 @@
 // Created by guozhenxiong on 2021-07-02.
 //
 
-#include "task_runner/message_loop.h"
+#include "message_loop.h"
 #include "thread_local.h"
 #include "logging/logging.h"
+#include "message_loop_impl.h"
+
 namespace wtf {
 
 WTF_THREAD_LOCAL std::unique_ptr<MessageLoop> tls_message_loop;
@@ -21,10 +23,8 @@ bool MessageLoop::IsInitializedForCurrentThread() {
 }
 
 MessageLoop::MessageLoop()
-        : loop_(MessageLoopImpl::Create()),
-          task_runner_(std::make_unique<wtf::TaskRunner>(loop_.get())) {
+        : loop_(MessageLoopImpl::Create()) {
     WTF_CHECK(loop_ != nullptr);
-    WTF_CHECK(task_runner_ != nullptr);
 }
 
 void MessageLoop::AddTaskObserver(intptr_t key, const std::function<void ()>& callback) {
@@ -49,10 +49,6 @@ TaskQueueId MessageLoop::GetCurrentTaskQueueId() {
 
 MessageLoopImpl* MessageLoop::GetLoopImpl() const {
     return loop_.get();
-}
-
-wtf::TaskRunner* MessageLoop::GetTaskRunner() const {
-    return task_runner_.get();
 }
 
 void MessageLoop::Run() {

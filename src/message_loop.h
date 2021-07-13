@@ -6,6 +6,8 @@
 #define TASKRUNNER_MESSAGE_LOOP_H
 
 #include "task_runner/task_runner.h"
+#include "task_queue_id.h"
+#include "message_loop_impl.h"
 
 namespace wtf {
 class MessageLoop {
@@ -26,8 +28,6 @@ public:
 
     void RemoveTaskObserver(intptr_t key);
 
-    wtf::TaskRunner* GetTaskRunner() const;
-
     void RunExpiredTasksNow();
 
     ~MessageLoop() {};
@@ -38,7 +38,6 @@ private:
     friend class MessageLoopImpl;
 
     std::unique_ptr<MessageLoopImpl> loop_;
-    std::unique_ptr<wtf::TaskRunner> task_runner_;
 
     MessageLoop();
 
