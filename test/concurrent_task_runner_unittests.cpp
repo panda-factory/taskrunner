@@ -26,8 +26,7 @@ TEST(ConcurrentTaskRunner, CanRunAndTerminate)
     task_runner->PostTask([&started]() {
         started = true;
     });
-    task_runner->Terminate();
-    task_runner->Join();
+    task_runner.reset();
     ASSERT_TRUE(started);
 }
 
@@ -40,7 +39,6 @@ TEST(ConcurrentTaskRunner, CanRunCountWorkerAndTerminate)
     task_runner->PostTaskToAllWorkers([&count]() {
         count++;
     });
-    task_runner->Terminate();
-    task_runner->Join();
+    task_runner.reset();
     ASSERT_EQ(count, 10);
 }
