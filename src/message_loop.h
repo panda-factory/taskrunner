@@ -7,17 +7,13 @@
 
 #include "task_runner/task_runner.h"
 #include "task_queue_id.h"
-#include "message_loop_impl.h"
+#include "delayed_message_loop_impl.h"
 #include "macros.h"
 
 namespace wtf {
 class MessageLoop {
 public:
     static void EnsureInitializedForCurrentThread();
-
-    static bool IsInitializedForCurrentThread();
-
-    static TaskQueueId GetCurrentTaskQueueId();
 
     static MessageLoop& GetCurrent();
 
@@ -35,14 +31,14 @@ public:
 
 
 private:
-    friend class TaskRunner;
-    friend class MessageLoopImpl;
+    friend class DelayedTaskRunner;
+    friend class DelayedMessageLoopImpl;
 
-    std::unique_ptr<MessageLoopImpl> loop_;
+    std::unique_ptr<DelayedMessageLoopImpl> loop_;
 
     MessageLoop();
 
-    MessageLoopImpl* GetLoopImpl() const;
+    DelayedMessageLoopImpl* GetLoopImpl() const;
 
     WTF_DISALLOW_COPY_AND_ASSIGN(MessageLoop);
 

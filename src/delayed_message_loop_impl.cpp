@@ -2,23 +2,23 @@
 // Created by guozhenxiong on 2021-07-02.
 //
 
-#include "message_loop_impl.h"
+#include "delayed_message_loop_impl.h"
 #include "message_loop.h"
-#include "platform/win/message_loop_win.h"
+#include "platform/win/delayed_message_loop_win.h"
 #include "logging/logging.h"
 
 namespace wtf {
 
-std::unique_ptr<MessageLoopImpl> MessageLoopImpl::Create()
+std::unique_ptr<DelayedMessageLoopImpl> DelayedMessageLoopImpl::Create()
 {
 #if OS_WIN
-    return std::make_unique<MessageLoopWin>();
+    return std::make_unique<DelayedMessageLoopWin>();
 #else
     return nullptr;
 #endif
 }
 
-MessageLoopImpl::MessageLoopImpl()
+DelayedMessageLoopImpl::DelayedMessageLoopImpl()
         : task_queue_(MessageLoopTaskQueues::GetInstance()),
           queue_id_(task_queue_->CreateTaskQueue()),
           terminated_(false)
@@ -26,12 +26,12 @@ MessageLoopImpl::MessageLoopImpl()
     task_queue_->SetWakeable(queue_id_, this);
 }
 
-MessageLoopImpl::~MessageLoopImpl()
+DelayedMessageLoopImpl::~DelayedMessageLoopImpl()
 {
     task_queue_->Dispose(queue_id_);
 }
 
-void MessageLoopImpl::AddTaskObserver(intptr_t key,
+void DelayedMessageLoopImpl::AddTaskObserver(intptr_t key,
                                       const std::function<void ()> &callback)
 {
     WTF_DCHECK(callback != nullptr);
@@ -45,7 +45,14 @@ void MessageLoopImpl::AddTaskObserver(intptr_t key,
     }
 }
 
-void MessageLoopImpl::DoRun()
+void DelayedMessageLoopImpl::RemoveTaskObserver(intptr_t key) {
+    WTF_DCHECK(MessageLoop::GetCurrent().GetLoopImpl() == this)
+            << "Message loop task observer must be removed from the same thread as "
+               "the loop.";
+    task_queue_->RemoveTaskObserver(queue_id_, key);
+}
+
+void DelayedMessageLoopImpl::DoRun()
 {
     if (terminated_) {
         return;
@@ -59,13 +66,13 @@ void MessageLoopImpl::DoRun()
     task_queue_->DisposeTasks(queue_id_);
 }
 
-void MessageLoopImpl::DoTerminate()
+void DelayedMessageLoopImpl::DoTerminate()
 {
     terminated_ = true;
     Terminate();
 }
 
-void MessageLoopImpl::FlushTasks(FlushType type)
+void DelayedMessageLoopImpl::FlushTasks(FlushType type)
 {
 
     const auto now = std::chrono::steady_clock::now();
@@ -87,7 +94,7 @@ void MessageLoopImpl::FlushTasks(FlushType type)
     } while (invocation);
 }
 
-void MessageLoopImpl::PostTask(const std::function<void ()> &task,
+void DelayedMessageLoopImpl::PostTask(const std::function<void ()> &task,
                                const std::chrono::steady_clock::time_point& target_time)
 {
     WTF_DCHECK(task != nullptr);
@@ -100,12 +107,12 @@ void MessageLoopImpl::PostTask(const std::function<void ()> &task,
     task_queue_->RegisterTask(queue_id_, task, target_time);
 }
 
-void MessageLoopImpl::RunExpiredTasksNow()
+void DelayedMessageLoopImpl::RunExpiredTasksNow()
 {
     FlushTasks(FlushType::All);
 }
 
-TaskQueueId MessageLoopImpl::GetTaskQueueId() const
+TaskQueueId DelayedMessageLoopImpl::GetTaskQueueId() const
 {
     return queue_id_;
 }

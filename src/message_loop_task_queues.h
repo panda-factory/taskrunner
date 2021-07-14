@@ -63,7 +63,6 @@ public:
     void SetWakeable(TaskQueueId queue_id, wtf::Wakeable* wakeable);
 
 private:
-    class MergedQueuesRunner;
 
     MessageLoopTaskQueues() = default;
 
@@ -84,10 +83,7 @@ private:
 
     std::atomic_int order_ = 0;
 
-    MessageLoopTaskQueues(const MessageLoopTaskQueues&) = delete;
-    MessageLoopTaskQueues(MessageLoopTaskQueues&&) = delete;
-    MessageLoopTaskQueues& operator=(const MessageLoopTaskQueues&) = delete;
-    MessageLoopTaskQueues& operator=(MessageLoopTaskQueues&&) = delete;
+    WTF_DISALLOW_COPY_ASSIGN_AND_MOVE(MessageLoopTaskQueues);
 
 };
 enum class FlushType {

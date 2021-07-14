@@ -2,19 +2,19 @@
 // Created by guozhenxiong on 2021-07-03.
 //
 
-#ifndef TASKRUNNER_MESSAGE_LOOP_WIN_H
-#define TASKRUNNER_MESSAGE_LOOP_WIN_H
+#ifndef TASKRUNNER_DELAYED_MESSAGE_LOOP_WIN_H
+#define TASKRUNNER_DELAYED_MESSAGE_LOOP_WIN_H
 
 #include <windows.h>
 
-#include "message_loop_impl.h"
+#include "delayed_message_loop_impl.h"
 
 namespace wtf {
 
-class MessageLoopWin : public MessageLoopImpl {
+class DelayedMessageLoopWin : public DelayedMessageLoopImpl {
 public:
-    MessageLoopWin();
-    ~MessageLoopWin() = default;
+    DelayedMessageLoopWin();
+    ~DelayedMessageLoopWin() = default;
 private:
     struct UniqueHandleTraits {
         static HANDLE InvalidValue() { return NULL; }
@@ -32,11 +32,11 @@ private:
 
     void WakeUp(const std::chrono::steady_clock::time_point& time_point) override;
 
-    MessageLoopWin(const MessageLoopWin&) = delete;
-    MessageLoopWin& operator=(const MessageLoopWin&) = delete;
+    DelayedMessageLoopWin(const DelayedMessageLoopWin&) = delete;
+    DelayedMessageLoopWin& operator=(const DelayedMessageLoopWin&) = delete;
 };
 
 } // namespace wtf
 
 
-#endif //TASKRUNNER_MESSAGE_LOOP_WIN_H
+#endif //TASKRUNNER_DELAYED_MESSAGE_LOOP_WIN_H

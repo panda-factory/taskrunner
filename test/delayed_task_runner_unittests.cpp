@@ -6,16 +6,16 @@
 #include "task_runner/task_runner.h"
 #include "gtest/gtest.h"
 
-TEST(TaskRunner, CreateAndTerminate)
+TEST(DelayedTaskRunner, CreateAndTerminate)
 {
-    auto task_runner = wtf::TaskRunner::CreateTaskRunner("aaa");
+    auto task_runner = wtf::DelayedTaskRunner::CreateTaskRunner("aaa");
     ASSERT_NE(task_runner.get(), nullptr);
 }
 
-TEST(TaskRunner, CanRunAndTerminate)
+TEST(DelayedTaskRunner, CanRunAndTerminate)
 {
     bool started = false;
-    auto task_runner = wtf::TaskRunner::CreateTaskRunner();
+    auto task_runner = wtf::DelayedTaskRunner::CreateTaskRunner();
     ASSERT_NE(task_runner.get(), nullptr);
 
     task_runner->PostTask([&started]() {
@@ -26,11 +26,11 @@ TEST(TaskRunner, CanRunAndTerminate)
     ASSERT_TRUE(started);
 }
 
-TEST(TaskRunner, NonDelayedTasksAreRunInOrder)
+TEST(DelayedTaskRunner, NonDelayedTasksAreRunInOrder)
 {
     const size_t count = 100;
     size_t current = 0;
-    auto task_runner = wtf::TaskRunner::CreateTaskRunner();
+    auto task_runner = wtf::DelayedTaskRunner::CreateTaskRunner();
 
     for (size_t i = 0; i < count; i++) {
         task_runner->PostTask([i, &current]() {
@@ -43,12 +43,12 @@ TEST(TaskRunner, NonDelayedTasksAreRunInOrder)
     ASSERT_EQ(current, count);
 }
 
-TEST(TaskRunner, DelayedTasksAtSameTimeAreRunInOrder)
+TEST(DelayedTaskRunner, DelayedTasksAtSameTimeAreRunInOrder)
 {
     const size_t count = 100;
     size_t current = 0;
     bool terminated = false;
-    auto task_runner = wtf::TaskRunner::CreateTaskRunner();
+    auto task_runner = wtf::DelayedTaskRunner::CreateTaskRunner();
 
     const auto now_plus_some =
             std::chrono::steady_clock::now() + std::chrono::milliseconds(2);
@@ -68,10 +68,10 @@ TEST(TaskRunner, DelayedTasksAtSameTimeAreRunInOrder)
     ASSERT_TRUE(terminated);
 }
 
-TEST(TaskRunner, SingleDelayedTaskByDuration)
+TEST(DelayedTaskRunner, SingleDelayedTaskByDuration)
 {
     bool checked = false;
-    auto task_runner = wtf::TaskRunner::CreateTaskRunner();
+    auto task_runner = wtf::DelayedTaskRunner::CreateTaskRunner();
 
     auto begin = std::chrono::steady_clock::now();
     task_runner->PostDelayedTask(

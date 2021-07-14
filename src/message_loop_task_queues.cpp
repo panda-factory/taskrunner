@@ -39,6 +39,12 @@ void MessageLoopTaskQueues::AddTaskObserver(TaskQueueId queue_id,
     queue_entries_.at(queue_id)->task_observers[key] = callback;
 }
 
+void MessageLoopTaskQueues::RemoveTaskObserver(TaskQueueId queue_id,
+                                               intptr_t key) {
+    std::lock_guard guard(queue_mutex_);
+    queue_entries_.at(queue_id)->task_observers.erase(key);
+}
+
 TaskQueueId MessageLoopTaskQueues::CreateTaskQueue()
 {
     std::scoped_lock locker(queue_mutex_);

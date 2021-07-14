@@ -2,8 +2,8 @@
 // Created by guozhenxiong on 2021-07-02.
 //
 
-#ifndef TASKRUNNER_MESSAGE_LOOP_IMPL_H
-#define TASKRUNNER_MESSAGE_LOOP_IMPL_H
+#ifndef TASKRUNNER_DELAYED_MESSAGE_LOOP_IMPL_H
+#define TASKRUNNER_DELAYED_MESSAGE_LOOP_IMPL_H
 
 #include "wakeable.h"
 #include "task_queue_id.h"
@@ -12,11 +12,11 @@
 
 namespace wtf {
 
-class MessageLoopImpl : public Wakeable {
+class DelayedMessageLoopImpl : public Wakeable {
 public:
-    static std::unique_ptr<MessageLoopImpl> Create();
+    static std::unique_ptr<DelayedMessageLoopImpl> Create();
 
-    virtual ~MessageLoopImpl();
+    virtual ~DelayedMessageLoopImpl();
 
     virtual void Run() = 0;
 
@@ -40,7 +40,7 @@ protected:
     void RunExpiredTasksNow();
 
 protected:
-    MessageLoopImpl();
+    DelayedMessageLoopImpl();
 
 private:
     MessageLoopTaskQueues* task_queue_;
@@ -50,9 +50,9 @@ private:
 
     void FlushTasks(FlushType type);
 
-    WTF_DISALLOW_COPY_AND_ASSIGN(MessageLoopImpl);
+    WTF_DISALLOW_COPY_AND_ASSIGN(DelayedMessageLoopImpl);
 
 };
 } // namespace wtf
 
-#endif //TASKRUNNER_MESSAGE_LOOP_IMPL_H
+#endif //TASKRUNNER_DELAYED_MESSAGE_LOOP_IMPL_H
