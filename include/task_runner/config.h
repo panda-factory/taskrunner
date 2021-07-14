@@ -5,14 +5,12 @@
 #ifndef TASKRUNNER_CONFIG_H
 #define TASKRUNNER_CONFIG_H
 
-#if defined(STATIC_LIB)
-#define WTF_DLL
-#else
-#if !defined(USE_DLL)
+#if BUILDING_SHARED
 #define WTF_DLL     __declspec(dllexport)
-#else         /* use a DLL library */
+#elif USING_SHARED         /* use a DLL library */
 #define WTF_DLL     __declspec(dllimport)
-#endif
+#else
+#define WTF_DLL
 #endif
 
 #endif //TASKRUNNER_CONFIG_H

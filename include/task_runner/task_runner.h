@@ -14,7 +14,7 @@
 namespace wtf {
 class MessageLoopImpl;
 
-WTF_DLL class TaskRunner {
+class WTF_DLL TaskRunner {
 public:
     static std::unique_ptr<TaskRunner> CreateTaskRunner(const std::string& task_name = "");
 
