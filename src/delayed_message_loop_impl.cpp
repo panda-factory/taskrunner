@@ -3,7 +3,7 @@
 //
 
 #include "delayed_message_loop_impl.h"
-#include "message_loop.h"
+#include "delayed_message_loop.h"
 #include "platform/win/delayed_message_loop_win.h"
 #include "logging/logging.h"
 
@@ -35,7 +35,7 @@ void DelayedMessageLoopImpl::AddTaskObserver(intptr_t key,
                                       const std::function<void ()> &callback)
 {
     WTF_DCHECK(callback != nullptr);
-    WTF_DCHECK(MessageLoop::GetCurrent().GetLoopImpl() == this)
+    WTF_DCHECK(DelayedMessageLoop::GetCurrent().GetLoopImpl() == this)
     << "Message loop task observer must be added on the same thread as the "
        "loop.";
     if (callback != nullptr) {
@@ -46,7 +46,7 @@ void DelayedMessageLoopImpl::AddTaskObserver(intptr_t key,
 }
 
 void DelayedMessageLoopImpl::RemoveTaskObserver(intptr_t key) {
-    WTF_DCHECK(MessageLoop::GetCurrent().GetLoopImpl() == this)
+    WTF_DCHECK(DelayedMessageLoop::GetCurrent().GetLoopImpl() == this)
             << "Message loop task observer must be removed from the same thread as "
                "the loop.";
     task_queue_->RemoveTaskObserver(queue_id_, key);

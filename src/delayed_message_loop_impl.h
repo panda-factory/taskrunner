@@ -35,7 +35,7 @@ public:
     virtual TaskQueueId GetTaskQueueId() const;
 
 protected:
-    friend class MessageLoop;
+    friend class DelayedMessageLoop;
 
     void RunExpiredTasksNow();
 

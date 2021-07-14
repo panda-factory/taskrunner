@@ -24,7 +24,7 @@ ConcurrentTaskRunner::ConcurrentTaskRunner(size_t worker_count)
             wtf::TaskRunner::SetCurrentThreadName(
                     std::string{"worker." + std::to_string(i + 1)});
 
-            loop->WorkerMain();
+            loop->Run();
         });
     }
 
@@ -51,11 +51,6 @@ void ConcurrentTaskRunner::PostTask(const std::function<void ()>& task) {
 
     loop_->PostTask(task);
     return;
-
-    WTF_DLOG(WARNING)
-            << "Tried to post to a concurrent message loop that has already died. "
-               "Executing the task on the callers thread.";
-    task();
 }
 
 void ConcurrentTaskRunner::Join()

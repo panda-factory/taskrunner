@@ -11,9 +11,11 @@
 #include <condition_variable>
 #include <map>
 
+#include "message_loop.h"
+
 namespace wtf {
 
-class ConcurrentMessageLoop {
+class ConcurrentMessageLoop : public MessageLoop {
 public:
     bool HasThreadTasksLocked() const;
 
@@ -27,7 +29,7 @@ public:
 
     void Terminate();
 
-    void WorkerMain();
+    void Run() override;
 
     ConcurrentMessageLoop() = default;
 private:

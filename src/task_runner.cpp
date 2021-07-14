@@ -6,7 +6,7 @@
 
 #include <future>
 
-#include "message_loop.h"
+#include "delayed_message_loop.h"
 #include "delayed_message_loop_impl.h"
 #include <iostream>
 #if defined(OS_WIN)
@@ -54,8 +54,8 @@ std::unique_ptr<DelayedTaskRunner> DelayedTaskRunner::CreateTaskRunner(const std
 
     task_runner->thread_ = std::make_unique<std::thread>([&message_loop_promise, task_name]() -> void {
         SetCurrentThreadName(task_name);
-        wtf::MessageLoop::EnsureInitializedForCurrentThread();
-        auto& loop = MessageLoop::GetCurrent();
+        wtf::DelayedMessageLoop::EnsureInitializedForCurrentThread();
+        auto& loop = DelayedMessageLoop::GetCurrent();
         message_loop_promise.set_value(loop.GetLoopImpl());
         loop.Run();
     });
@@ -108,7 +108,7 @@ void DelayedTaskRunner::PostDelayedTask(const std::function<void ()>& task,
 
 void DelayedTaskRunner::Terminate() {
     PostTask([]() {
-        MessageLoop::GetCurrent().Terminate();
+        DelayedMessageLoop::GetCurrent().Terminate();
     });
 }
 

@@ -2,44 +2,44 @@
 // Created by guozhenxiong on 2021-07-02.
 //
 
-#include "message_loop.h"
+#include "delayed_message_loop.h"
 #include "thread_local.h"
 #include "logging/logging.h"
 #include "delayed_message_loop_impl.h"
 
 namespace wtf {
 
-WTF_THREAD_LOCAL std::unique_ptr<MessageLoop> tls_message_loop;
+WTF_THREAD_LOCAL std::unique_ptr<DelayedMessageLoop> tls_message_loop;
 
-void MessageLoop::EnsureInitializedForCurrentThread() {
+void DelayedMessageLoop::EnsureInitializedForCurrentThread() {
     if (tls_message_loop.get() != nullptr) {
         return;
     }
-    tls_message_loop.reset(new MessageLoop());
+    tls_message_loop.reset(new DelayedMessageLoop());
 }
 
-MessageLoop::MessageLoop()
+DelayedMessageLoop::DelayedMessageLoop()
         : loop_(DelayedMessageLoopImpl::Create()) {
     WTF_CHECK(loop_ != nullptr);
 }
 
-MessageLoop& MessageLoop::GetCurrent() {
+DelayedMessageLoop& DelayedMessageLoop::GetCurrent() {
     auto* loop = tls_message_loop.get();
     WTF_CHECK(loop != nullptr)
-            << "MessageLoop::EnsureInitializedForCurrentThread was not called on "
+            << "DelayedMessageLoop::EnsureInitializedForCurrentThread was not called on "
                "this thread prior to message loop use.";
     return *loop;
 }
 
-DelayedMessageLoopImpl* MessageLoop::GetLoopImpl() const {
+DelayedMessageLoopImpl* DelayedMessageLoop::GetLoopImpl() const {
     return loop_.get();
 }
 
-void MessageLoop::Run() {
+void DelayedMessageLoop::Run() {
     loop_->DoRun();
 }
 
-void MessageLoop::Terminate() {
+void DelayedMessageLoop::Terminate() {
     loop_->DoTerminate();
 }
 
