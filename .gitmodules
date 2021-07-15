@@ -5,3 +5,6 @@
 [submodule "third-party/logging"]
 	path = third-party/logging
 	url = https://github.com/panda-factory/logging.git
+[submodule "third-party/benchmark"]
+	path = third-party/benchmark
+	url = https://github.com/google/benchmark.git
