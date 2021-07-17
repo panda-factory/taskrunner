@@ -5,9 +5,9 @@
 #ifndef TASKRUNNER_DELAYED_MESSAGE_LOOP_WIN_H
 #define TASKRUNNER_DELAYED_MESSAGE_LOOP_WIN_H
 
-#include <windows.h>
+#include <Windows.h>
 
-#include "delayed_message_loop_impl.h"
+#include "delayed/delayed_message_loop_impl.h"
 
 namespace wtf {
 

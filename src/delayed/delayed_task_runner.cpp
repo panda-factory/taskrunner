@@ -60,12 +60,12 @@ void DelayedTaskRunner::PostTask(const std::function<void ()>& task) {
     loop_->PostTask(task, std::chrono::steady_clock::now());
 }
 
-void DelayedTaskRunner::PostTaskForTime(const std::function<void ()>& task,
+void DelayedTaskRunner::PostTaskFor(const std::function<void ()>& task,
                                         const std::chrono::steady_clock::time_point& target_time) {
     loop_->PostTask(task, target_time);
 }
 
-void DelayedTaskRunner::PostDelayedTask(const std::function<void ()>& task,
+void DelayedTaskRunner::PostTaskUntil(const std::function<void ()>& task,
                                         const std::chrono::milliseconds& delay) {
     loop_->PostTask(task, std::chrono::steady_clock::now() + delay);
 }

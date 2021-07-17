@@ -53,7 +53,7 @@ TEST(DelayedTaskRunner, DelayedTasksAtSameTimeAreRunInOrder)
     const auto now_plus_some =
             std::chrono::steady_clock::now() + std::chrono::milliseconds(2);
     for (size_t i = 0; i < count; i++) {
-        task_runner->PostTaskForTime([i, &current, task_runner = task_runner.get(), &terminated, count]() {
+        task_runner->PostTaskFor([i, &current, task_runner = task_runner.get(), &terminated, count]() {
             ASSERT_EQ(current, i);
             current++;
             if (count == i + 1) {
@@ -74,7 +74,7 @@ TEST(DelayedTaskRunner, SingleDelayedTaskByDuration)
     auto task_runner = wtf::DelayedTaskRunner::CreateTaskRunner();
 
     auto begin = std::chrono::steady_clock::now();
-    task_runner->PostDelayedTask(
+    task_runner->PostTaskUntil(
             [begin, &checked, &task_runner]() {
                 auto delta = std::chrono::steady_clock::now() - begin;
                 auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(delta).count();

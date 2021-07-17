@@ -17,7 +17,13 @@ void MessageLoop::EnsureInitializedForCurrentThread() {
 }
 
 MessageLoop::MessageLoop()
-        : loop_(std::make_unique<MessageLoopImpl>())
+        : MessageLoop(std::make_unique<MessageLoopImpl>())
+{
+    WTF_CHECK(loop_ != nullptr);
+}
+
+MessageLoop::MessageLoop(std::unique_ptr<MessageLoopImpl> loop)
+    : loop_(std::move(loop))
 {
     WTF_CHECK(loop_ != nullptr);
 }

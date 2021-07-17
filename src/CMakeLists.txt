@@ -1,23 +1,22 @@
 
 
 SET(TASK_RUNNER_SRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/concurrent_message_loop.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/concurrent_task_runner.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/delayed_task.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/delayed_task_runner.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/delayed_message_loop.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/delayed_message_loop_impl.cpp
+    concurrent/concurrent_message_loop.cpp
+    concurrent/concurrent_task_runner.cpp
+    delayed/delayed_task_runner.cpp
+    delayed/delayed_message_loop.cpp
+    delayed/delayed_message_loop_impl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/message_loop.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/message_loop_impl.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/message_loop_task_queues.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/task.cpp
+    delayed/message_loop_task_queues.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/task_type.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/task_queues.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/task_runner.cpp
     )
 
 IF(WIN32)
     SET(TASK_RUNNER_SRC ${TASK_RUNNER_SRC}
-        ${CMAKE_CURRENT_SOURCE_DIR}/platform/win/delayed_message_loop_win.cpp)
+        delayed/platform/win/delayed_message_loop_win.cpp)
 ENDIF()
 
 IF(BUILDING_SHARED)

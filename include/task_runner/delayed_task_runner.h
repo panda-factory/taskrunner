@@ -10,23 +10,28 @@
 namespace wtf {
 class DelayedMessageLoopImpl;
 
-class WTF_DLL DelayedTaskRunner : public TaskRunner {
+class WTF_DLL DelayedTaskRunner final : public TaskRunner {
 public:
     static std::unique_ptr<DelayedTaskRunner> CreateTaskRunner(const std::string &task_name = "");
 
-    void AddTaskObserver(intptr_t key, const std::function<void()> &callback) override;
+    // | TaskRunner |
+    void PostTask(const std::function<void ()>& task) override;
 
+    // | TaskRunner |
+    void AddTaskObserver(intptr_t key, const std::function<void ()>& callback) override;
+
+    // | TaskRunner |
     void RemoveTaskObserver(intptr_t key) override;
 
+    // | TaskRunner |
     void Join() override;
 
-    void PostTask(const std::function<void()> &task) override;
-
-    void PostTaskForTime(const std::function<void()> &task, const std::chrono::steady_clock::time_point &target_time);
-
-    void PostDelayedTask(const std::function<void()> &task, const std::chrono::milliseconds &delay);
-
+    // | TaskRunner |
     void Terminate() override;
+
+    void PostTaskFor(const std::function<void()> &task, const std::chrono::steady_clock::time_point &target_time);
+
+    void PostTaskUntil(const std::function<void()> &task, const std::chrono::milliseconds &delay);
 
     DelayedTaskRunner();
 

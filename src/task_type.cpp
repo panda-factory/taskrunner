@@ -1,9 +1,15 @@
 //
-// Created by guozhenxiong on 2021-07-03.
+// Created by guozhenxiong on 2021-07-16.
 //
 
-#include "delayed_task.h"
+#include "task_type.h"
+
 namespace wtf {
+Task::Task(size_t order, const std::function<void ()>& task)
+        : order_(order),
+          task_(task)
+{
+}
 
 DelayedTask::DelayedTask(size_t order,
                          const std::function<void ()>& task,

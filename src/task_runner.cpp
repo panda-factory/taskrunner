@@ -6,8 +6,8 @@
 
 #include <future>
 
-#include "delayed_message_loop.h"
-#include "delayed_message_loop_impl.h"
+#include "delayed/delayed_message_loop.h"
+#include "delayed/delayed_message_loop_impl.h"
 #include <iostream>
 #if defined(OS_WIN)
 #include <windows.h>
@@ -97,6 +97,10 @@ void TaskRunner::Join() {
 }
 
 void TaskRunner::Terminate() {
+    if (terminated_) {
+        return;
+    }
+
     PostTask([]() {
         MessageLoop::GetCurrent().Terminate();
     });

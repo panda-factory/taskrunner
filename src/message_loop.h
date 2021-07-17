@@ -27,6 +27,8 @@ private:
 
     MessageLoopImpl* GetLoopImpl() const;
 
+    MessageLoop(std::unique_ptr<MessageLoopImpl> loop);
+
     std::unique_ptr<MessageLoopImpl> loop_;
 };
 }

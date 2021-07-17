@@ -8,9 +8,9 @@
 #include <map>
 #include <mutex>
 
+#include "task_type.h"
 #include "task_queue_id.h"
 #include "wakeable.h"
-#include "delayed_task.h"
 #include "macros.h"
 
 namespace wtf {
