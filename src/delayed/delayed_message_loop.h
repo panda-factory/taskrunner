@@ -16,11 +16,6 @@ class DelayedMessageLoop : public MessageLoop {
 public:
     static void EnsureInitializedForCurrentThread();
 
-    // | MessageLoop |
-    void Run() override;
-
-    void Terminate();
-
     void AddTaskObserver(intptr_t key, const std::function<void ()>& callback);
 
     void RemoveTaskObserver(intptr_t key);
@@ -33,10 +28,6 @@ public:
 
 
 private:
-    friend class DelayedTaskRunner;
-    friend class DelayedMessageLoopImpl;
-
-    MessageLoopImpl* GetLoopImpl() const;
 
     WTF_DISALLOW_COPY_AND_ASSIGN(DelayedMessageLoop);
 

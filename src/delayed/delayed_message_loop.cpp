@@ -21,16 +21,4 @@ DelayedMessageLoop::DelayedMessageLoop()
     WTF_CHECK(loop_ != nullptr);
 }
 
-MessageLoopImpl* DelayedMessageLoop::GetLoopImpl() const {
-    return loop_.get();
-}
-
-void DelayedMessageLoop::Run() {
-    loop_->DoRun();
-}
-
-void DelayedMessageLoop::Terminate() {
-    loop_->DoTerminate();
-}
-
 } // namespace wtf
