@@ -69,7 +69,8 @@ void ConcurrentMessageLoop::Terminate() {
     }
 }
 
-void ConcurrentMessageLoop::Run() {
+void ConcurrentMessageLoop::Run()
+{
     while (true) {
         std::unique_lock lock(tasks_mutex_);
         tasks_condition_.wait(lock, [&]() {

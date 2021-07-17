@@ -11,7 +11,8 @@ namespace wtf {
 
 WTF_THREAD_LOCAL std::unique_ptr<DelayedMessageLoop> tls_message_loop;
 
-void DelayedMessageLoop::EnsureInitializedForCurrentThread() {
+void DelayedMessageLoop::EnsureInitializedForCurrentThread()
+{
     if (tls_message_loop.get() != nullptr) {
         return;
     }

@@ -1,0 +1,47 @@
+//
+// Created by guozhenxiong on 2021-07-16.
+//
+#include "message_loop.h"
+#include "logging/logging.h"
+#include "thread_local.h"
+
+namespace wtf {
+
+WTF_THREAD_LOCAL std::unique_ptr<MessageLoop> tls_message_loop;
+
+void MessageLoop::EnsureInitializedForCurrentThread() {
+    if (tls_message_loop.get() != nullptr) {
+        return;
+    }
+    tls_message_loop.reset(new MessageLoop());
+}
+
+MessageLoop::MessageLoop()
+        : loop_(std::make_unique<MessageLoopImpl>())
+{
+    WTF_CHECK(loop_ != nullptr);
+}
+
+MessageLoop& MessageLoop::GetCurrent() {
+    auto* loop = tls_message_loop.get();
+    WTF_CHECK(loop != nullptr)
+    << "MessageLoop::EnsureInitializedForCurrentThread was not called on "
+       "this thread prior to message loop use.";
+    return *loop;
+}
+
+MessageLoopImpl* MessageLoop::GetLoopImpl() const
+{
+    return loop_.get();
+}
+
+void MessageLoop::Run()
+{
+    loop_->DoRun();
+}
+
+void MessageLoop::Terminate() {
+    loop_->DoTerminate();
+}
+
+}

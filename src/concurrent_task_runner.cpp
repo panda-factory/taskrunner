@@ -67,6 +67,7 @@ void ConcurrentTaskRunner::Join()
 void ConcurrentTaskRunner::Terminate()
 {
     loop_->Terminate();
+    terminated_ = true;
 }
 
 void ConcurrentTaskRunner::PostTaskToAllWorkers(const std::function<void ()>& task) {

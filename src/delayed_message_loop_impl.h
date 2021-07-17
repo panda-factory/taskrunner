@@ -9,10 +9,12 @@
 #include "task_queue_id.h"
 #include "message_loop_task_queues.h"
 #include "macros.h"
+#include "message_loop_impl.h"
 
 namespace wtf {
 
-class DelayedMessageLoopImpl : public Wakeable {
+class DelayedMessageLoopImpl : public MessageLoopImpl,
+                               public Wakeable {
 public:
     static std::unique_ptr<DelayedMessageLoopImpl> Create();
 
@@ -22,11 +24,11 @@ public:
 
     virtual void Terminate() = 0;
 
-    void PostTask(const std::function<void ()>& task, const std::chrono::steady_clock::time_point& target_time);
+    void PostTask(const std::function<void ()>& task, const std::chrono::steady_clock::time_point& target_time) override;
 
-    void AddTaskObserver(intptr_t key, const std::function<void ()>& callback);
+    void AddTaskObserver(intptr_t key, const std::function<void ()>& callback) override;
 
-    void RemoveTaskObserver(intptr_t key);
+    void RemoveTaskObserver(intptr_t key) override;
 
     void DoRun();
 
@@ -44,6 +46,7 @@ protected:
 
 private:
     MessageLoopTaskQueues* task_queue_;
+
     TaskQueueId queue_id_;
 
     std::atomic_bool terminated_;

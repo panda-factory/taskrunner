@@ -98,7 +98,6 @@ void DelayedMessageLoopImpl::PostTask(const std::function<void ()> &task,
                                const std::chrono::steady_clock::time_point& target_time)
 {
     WTF_DCHECK(task != nullptr);
-    WTF_DCHECK(task != nullptr);
     if (terminated_) {
         // If the message loop has already been terminated, PostTask should destruct
         // |task| synchronously within this function.

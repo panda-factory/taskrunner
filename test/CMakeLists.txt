@@ -19,7 +19,8 @@ IF(GTESTSRC_FOUND)
     INCLUDE_DIRECTORIES(${PROJECT_ROOT_PATH}/third-party/timepoint/include)
     ADD_EXECUTABLE(unittests
         delayed_task_runner_unittests.cpp
-        concurrent_task_runner_unittests.cpp)
+        concurrent_task_runner_unittests.cpp
+        task_runner_unittests.cpp)
     TARGET_LINK_LIBRARIES(unittests PRIVATE ${GTEST_LIBRARIES} taskrunner)
     IF(BUILDING_SHARED)
         TARGET_COMPILE_DEFINITIONS(unittests PRIVATE USING_SHARED=1)

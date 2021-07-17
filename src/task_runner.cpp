@@ -27,6 +27,26 @@ typedef struct tagTHREADNAME_INFO {
 } THREADNAME_INFO;
 #endif
 }
+
+// | static |
+std::unique_ptr<TaskRunner> TaskRunner::Create(const std::string& task_name)
+{
+    auto task_runner = std::make_unique<TaskRunner>();
+    std::promise<wtf::MessageLoopImpl*> message_loop_promise;
+    auto message_loop_future = message_loop_promise.get_future();
+
+    task_runner->thread_ = std::make_unique<std::thread>([&message_loop_promise, task_name]() -> void {
+        SetCurrentThreadName(task_name);
+        wtf::MessageLoop::EnsureInitializedForCurrentThread();
+        auto& loop = MessageLoop::GetCurrent();
+        message_loop_promise.set_value(loop.GetLoopImpl());
+        loop.Run();
+    });
+    task_runner->loop_ = message_loop_future.get();
+
+    return std::move(task_runner);
+}
+
 // | static |
 void TaskRunner::SetCurrentThreadName(const std::string& name) {
     if (name == "") {
@@ -46,70 +66,43 @@ void TaskRunner::SetCurrentThreadName(const std::string& name) {
 #endif
 }
 
-std::unique_ptr<DelayedTaskRunner> DelayedTaskRunner::CreateTaskRunner(const std::string& task_name)
-{
-    auto task_runner = std::make_unique<DelayedTaskRunner>();
-    std::promise<wtf::DelayedMessageLoopImpl*> message_loop_promise;
-    auto message_loop_future = message_loop_promise.get_future();
-
-    task_runner->thread_ = std::make_unique<std::thread>([&message_loop_promise, task_name]() -> void {
-        SetCurrentThreadName(task_name);
-        wtf::DelayedMessageLoop::EnsureInitializedForCurrentThread();
-        auto& loop = DelayedMessageLoop::GetCurrent();
-        message_loop_promise.set_value(loop.GetLoopImpl());
-        loop.Run();
-    });
-    task_runner->loop_ = message_loop_future.get();
-
-    return std::move(task_runner);
-}
-
-DelayedTaskRunner::DelayedTaskRunner() : joined_(false), loop_(nullptr)
+TaskRunner::TaskRunner() : joined_(false), terminated_(false)
 {}
 
-DelayedTaskRunner::DelayedTaskRunner(wtf::DelayedMessageLoopImpl* loop)
-        : loop_(loop) {}
-
-DelayedTaskRunner::~DelayedTaskRunner()
+TaskRunner::~TaskRunner()
 {
     Terminate();
     Join();
 }
 
-void DelayedTaskRunner::AddTaskObserver(intptr_t key, const std::function<void ()>& callback) {
-    loop_->AddTaskObserver(key, callback);
+void TaskRunner::PostTask(const std::function<void ()>& task)
+{
+    if (terminated_) {
+        // If the message loop has already been terminated, PostTask should destruct
+        // |task| synchronously within this function.
+        return;
+    }
+    loop_->PostTask(task);
 }
 
-void DelayedTaskRunner::RemoveTaskObserver(intptr_t key) {
-    loop_->RemoveTaskObserver(key);
-}
-
-void DelayedTaskRunner::Join() {
+void TaskRunner::Join() {
     if (joined_) {
         return;
     }
     joined_ = true;
-    thread_->join();
+
+    if (thread_) {
+        thread_->join();
+    }
 }
 
-void DelayedTaskRunner::PostTask(const std::function<void ()>& task) {
-    loop_->PostTask(task, std::chrono::steady_clock::now());
-}
-
-void DelayedTaskRunner::PostTaskForTime(const std::function<void ()>& task,
-                                 const std::chrono::steady_clock::time_point& target_time) {
-    loop_->PostTask(task, target_time);
-}
-
-void DelayedTaskRunner::PostDelayedTask(const std::function<void ()>& task,
-                                 const std::chrono::milliseconds& delay) {
-    loop_->PostTask(task, std::chrono::steady_clock::now() + delay);
-}
-
-void DelayedTaskRunner::Terminate() {
+void TaskRunner::Terminate() {
     PostTask([]() {
-        DelayedMessageLoop::GetCurrent().Terminate();
+        MessageLoop::GetCurrent().Terminate();
     });
+    terminated_ = true;
 }
+
+
 
 } // namespace wtf
