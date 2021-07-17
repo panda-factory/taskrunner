@@ -41,7 +41,7 @@ protected:
 
 private:
 
-    wtf::DelayedMessageLoopImpl *loop_;
+    wtf::MessageLoopImpl *loop_;
 
     DelayedTaskRunner(wtf::DelayedMessageLoopImpl *loop);
 

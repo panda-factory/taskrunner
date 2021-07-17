@@ -9,11 +9,15 @@ namespace wtf {
 
 WTF_THREAD_LOCAL std::unique_ptr<MessageLoop> tls_message_loop;
 
-void MessageLoop::EnsureInitializedForCurrentThread() {
+void MessageLoop::EnsureInitializedForCurrentThread(std::unique_ptr<MessageLoop> loop) {
     if (tls_message_loop.get() != nullptr) {
         return;
     }
-    tls_message_loop.reset(new MessageLoop());
+    if (loop) {
+        tls_message_loop = std::move(loop);
+    } else {
+        tls_message_loop.reset(new MessageLoop());
+    }
 }
 
 MessageLoop::MessageLoop()

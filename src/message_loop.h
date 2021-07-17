@@ -12,7 +12,7 @@
 namespace wtf {
 class MessageLoop {
 public:
-    static void EnsureInitializedForCurrentThread();
+    static void EnsureInitializedForCurrentThread(std::unique_ptr<MessageLoop> loop = nullptr);
 
     static MessageLoop& GetCurrent();
 
@@ -20,16 +20,18 @@ public:
 
     virtual void Terminate();
 
+    MessageLoopImpl* GetLoopImpl() const;
+
     MessageLoop();
+
+protected:
+    MessageLoop(std::unique_ptr<MessageLoopImpl> loop);
+
+    std::unique_ptr<MessageLoopImpl> loop_;
 private:
     friend class TaskRunner;
     friend class MessageLoopImpl;
 
-    MessageLoopImpl* GetLoopImpl() const;
-
-    MessageLoop(std::unique_ptr<MessageLoopImpl> loop);
-
-    std::unique_ptr<MessageLoopImpl> loop_;
 };
 }
 #endif //TASKRUNNER_MESSAGELOOP_H

@@ -9,30 +9,19 @@
 
 namespace wtf {
 
-WTF_THREAD_LOCAL std::unique_ptr<DelayedMessageLoop> tls_message_loop;
-
 void DelayedMessageLoop::EnsureInitializedForCurrentThread()
 {
-    if (tls_message_loop.get() != nullptr) {
-        return;
-    }
-    tls_message_loop.reset(new DelayedMessageLoop());
+    auto loop = std::make_unique<DelayedMessageLoop>();
+    MessageLoop::EnsureInitializedForCurrentThread(std::move(loop));
 }
 
 DelayedMessageLoop::DelayedMessageLoop()
-        : loop_(DelayedMessageLoopImpl::Create()) {
+        : MessageLoop(DelayedMessageLoopImpl::Create())
+{
     WTF_CHECK(loop_ != nullptr);
 }
 
-DelayedMessageLoop& DelayedMessageLoop::GetCurrent() {
-    auto* loop = tls_message_loop.get();
-    WTF_CHECK(loop != nullptr)
-            << "DelayedMessageLoop::EnsureInitializedForCurrentThread was not called on "
-               "this thread prior to message loop use.";
-    return *loop;
-}
-
-DelayedMessageLoopImpl* DelayedMessageLoop::GetLoopImpl() const {
+MessageLoopImpl* DelayedMessageLoop::GetLoopImpl() const {
     return loop_.get();
 }
 

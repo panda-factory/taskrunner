@@ -16,8 +16,6 @@ class DelayedMessageLoop : public MessageLoop {
 public:
     static void EnsureInitializedForCurrentThread();
 
-    static DelayedMessageLoop& GetCurrent();
-
     // | MessageLoop |
     void Run() override;
 
@@ -29,6 +27,8 @@ public:
 
     void RunExpiredTasksNow();
 
+    DelayedMessageLoop();
+
     ~DelayedMessageLoop() {};
 
 
@@ -36,11 +36,7 @@ private:
     friend class DelayedTaskRunner;
     friend class DelayedMessageLoopImpl;
 
-    std::unique_ptr<DelayedMessageLoopImpl> loop_;
-
-    DelayedMessageLoop();
-
-    DelayedMessageLoopImpl* GetLoopImpl() const;
+    MessageLoopImpl* GetLoopImpl() const;
 
     WTF_DISALLOW_COPY_AND_ASSIGN(DelayedMessageLoop);
 
