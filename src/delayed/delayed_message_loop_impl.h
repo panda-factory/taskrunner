@@ -47,7 +47,7 @@ protected:
     DelayedMessageLoopImpl();
 
 private:
-    DelayedTaskQueues* task_queue_;
+    TaskQueues* task_queue_;
 
     TaskQueueId queue_id_;
 

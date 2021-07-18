@@ -35,30 +35,34 @@ class TaskQueues {
 public:
     static TaskQueues *GetInstance();
 
-    void Dispose(TaskQueueId queue_id);
+    virtual void Dispose(TaskQueueId queue_id);
 
-    void DisposeTasks(TaskQueueId queue_id);
+    virtual void DisposeTasks(TaskQueueId queue_id);
 
-    void AddTaskObserver(TaskQueueId queue_id,
+    virtual void AddTaskObserver(TaskQueueId queue_id,
                          intptr_t key,
                          const std::function<void ()>& callback);
 
-    size_t GetNumPendingTasks(TaskQueueId queue_id) const;
+    virtual size_t GetNumPendingTasks(TaskQueueId queue_id) const;
 
-    bool HasPendingTasks(TaskQueueId queue_id) const;
+    virtual bool HasPendingTasks(TaskQueueId queue_id) const;
 
-    void RemoveTaskObserver(TaskQueueId queue_id, intptr_t key);
+    virtual void RemoveTaskObserver(TaskQueueId queue_id, intptr_t key);
 
-    std::vector<std::function<void ()>> GetObserversToNotify(TaskQueueId queue_id) const;
+    virtual std::vector<std::function<void ()>> GetObserversToNotify(TaskQueueId queue_id) const;
 
-    TaskQueueId CreateTaskQueue();
+    virtual TaskQueueId CreateTaskQueue();
 
-    std::function<void ()> GetNextTask(TaskQueueId queue_id);
+    virtual std::function<void ()> GetNextTask(TaskQueueId queue_id,
+                                               const std::chrono::steady_clock::time_point& from_time =
+                                                       std::chrono::steady_clock::time_point::max());
 
-    void RegisterTask(const TaskQueueId& queue_id,
-                              const std::function<void ()>& task);
+    virtual void RegisterTask(const TaskQueueId& queue_id,
+                              const std::function<void ()>& task,
+                              const std::chrono::steady_clock::time_point& =
+                                      std::chrono::steady_clock::time_point::max());
 
-    void SetWakeable(TaskQueueId queue_id, wtf::Wakeable *wakeable);
+    virtual void SetWakeable(TaskQueueId queue_id, wtf::Wakeable *wakeable);
 
     TaskQueues(std::unique_ptr<TaskQueuesImpl> task_queues);
 

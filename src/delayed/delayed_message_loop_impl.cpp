@@ -77,7 +77,7 @@ void DelayedMessageLoopImpl::FlushTasks(FlushType type)
     const auto now = std::chrono::steady_clock::now();
     std::function<void ()> invocation;
     do {
-        invocation = task_queue_->GetNextTaskToRun(queue_id_, now);
+        invocation = task_queue_->GetNextTask(queue_id_, now);
         if (!invocation) {
             break;
         }

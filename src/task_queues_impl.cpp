@@ -22,7 +22,8 @@ TaskQueueId TaskQueuesImpl::CreateTaskQueue()
     return loop_id;
 }
 
-std::function<void()> TaskQueuesImpl::GetNextTask(TaskQueueId queue_id)
+std::function<void()> TaskQueuesImpl::GetNextTask(TaskQueueId queue_id,
+                                                  const std::chrono::steady_clock::time_point&)
 {
     std::scoped_lock locker(queue_mutex_);
     if (!HasPendingTasks(queue_id)) {
@@ -87,7 +88,8 @@ size_t TaskQueuesImpl::GetNumPendingTasks(TaskQueueId queue_id) const
 }
 
 void TaskQueuesImpl::RegisterTask(TaskQueueId queue_id,
-                                  const std::function<void()> &task)
+                                  const std::function<void()> &task,
+                                  const std::chrono::steady_clock::time_point&)
 {
     std::scoped_lock locker(queue_mutex_);
     size_t order = order_++;

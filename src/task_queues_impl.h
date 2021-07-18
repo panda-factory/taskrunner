@@ -12,6 +12,15 @@
 #include "wakeable.h"
 #include "task_queue_id.h"
 
+#if OS_WIN
+#ifdef min
+#undef min
+#endif
+#ifdef max
+#undef max
+#endif
+#endif // OS_WIN
+
 namespace wtf {
 class TaskQueue;
 
@@ -37,10 +46,12 @@ public:
 
     virtual TaskQueueId CreateTaskQueue();
 
-    virtual std::function<void ()> GetNextTask(TaskQueueId queue_id);
+    virtual std::function<void ()> GetNextTask(TaskQueueId queue_id,
+                                               const std::chrono::steady_clock::time_point& from_time);
 
     virtual void RegisterTask(TaskQueueId queue_id,
-                              const std::function<void ()>& task);
+                              const std::function<void ()>& task,
+                              const std::chrono::steady_clock::time_point& target_time);
 
     virtual void SetWakeable(TaskQueueId queue_id, wtf::Wakeable *wakeable);
 

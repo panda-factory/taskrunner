@@ -33,9 +33,10 @@ TaskQueueId TaskQueues::CreateTaskQueue()
     return task_queues_impl_->CreateTaskQueue();
 }
 
-std::function<void()> TaskQueues::GetNextTask(TaskQueueId queue_id)
+std::function<void()> TaskQueues::GetNextTask(TaskQueueId queue_id,
+                                              const std::chrono::steady_clock::time_point& for_time)
 {
-    return task_queues_impl_->GetNextTask(queue_id);
+    return task_queues_impl_->GetNextTask(queue_id, for_time);
 }
 
 void TaskQueues::Dispose(TaskQueueId queue_id)
@@ -59,9 +60,10 @@ size_t TaskQueues::GetNumPendingTasks(TaskQueueId queue_id) const
 }
 
 void TaskQueues::RegisterTask(const TaskQueueId &queue_id,
-                              const std::function<void()> &task)
+                              const std::function<void()> &task,
+                              const std::chrono::steady_clock::time_point& target_time)
 {
-    task_queues_impl_->RegisterTask(queue_id, task);
+    task_queues_impl_->RegisterTask(queue_id, task, target_time);
 }
 
 void TaskQueues::AddTaskObserver(TaskQueueId queue_id,

@@ -10,7 +10,7 @@
 #include <mutex>
 
 #include "task_queues.h"
-#include "delayed/delayed_task_queues.h"
+#include "delayed/delayed_task_queues_impl.h"
 
 #if OS_WIN
 #ifdef min

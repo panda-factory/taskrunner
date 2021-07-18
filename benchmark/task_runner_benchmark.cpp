@@ -24,7 +24,7 @@ static void BM_TASK_RUNNER(benchmark::State& state) {  // NOLINT
     }
 }
 static void BM_DELAYED_TASK_RUNNER(benchmark::State& state) {  // NOLINT
-    auto task_runner = wtf::DelayedTaskRunner::CreateTaskRunner("task-runner");
+    auto task_runner = wtf::DelayedTaskRunner::CreateTaskRunner("delayed-task-runner");
     std::atomic_int count = 0;
     for (auto _ : state) {
         // This code gets timed

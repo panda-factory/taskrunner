@@ -1,14 +1,15 @@
 
 
 SET(TASK_RUNNER_SRC
-    concurrent/concurrent_message_loop.cpp
-    concurrent/concurrent_task_runner.cpp
-    delayed/delayed_task_runner.cpp
-    delayed/delayed_message_loop.cpp
-    delayed/delayed_message_loop_impl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/concurrent/concurrent_message_loop.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/concurrent/concurrent_task_runner.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/delayed/delayed_task_runner.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/delayed/delayed_message_loop.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/delayed/delayed_message_loop_impl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/delayed/delayed_task_queues.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/delayed/delayed_task_queues_impl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/message_loop.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/message_loop_impl.cpp
-    delayed/delayed_task_queues.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/task_type.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/task_queues.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/task_queues_impl.cpp
