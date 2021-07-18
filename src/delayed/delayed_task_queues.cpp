@@ -2,7 +2,7 @@
 // Created by guozhenxiong on 2021-07-02.
 //
 
-#include "message_loop_task_queues.h"
+#include "delayed_task_queues.h"
 
 #include <memory>
 
@@ -21,31 +21,62 @@ TaskQueueEntry::TaskQueueEntry(TaskQueueId owner_of)
     task_observers = TaskObservers();
 }
 
-MessageLoopTaskQueues *MessageLoopTaskQueues::GetInstance()
+void TaskQueueEntry::Erase()
 {
-    static MessageLoopTaskQueues *instance = nullptr;
+    task_queue_ = {};
+}
+
+bool TaskQueueEntry::IsEmpty()
+{
+    return task_queue_.empty();
+}
+
+size_t TaskQueueEntry::Size()
+{
+    return task_queue_.size();
+}
+
+void TaskQueueEntry::Pop()
+{
+    task_queue_.pop();
+}
+
+void TaskQueueEntry::Push(const DelayedTask& task)
+{
+    task_queue_.push(task);
+}
+
+DelayedTask TaskQueueEntry::Top()
+{
+    return task_queue_.top();
+}
+
+DelayedTaskQueues *DelayedTaskQueues::GetInstance()
+{
+    static DelayedTaskQueues *instance = nullptr;
     if (!instance) {
-        instance = new MessageLoopTaskQueues();
+        instance = new DelayedTaskQueues();
     }
     return instance;
 }
 
-void MessageLoopTaskQueues::AddTaskObserver(TaskQueueId queue_id,
+void DelayedTaskQueues::AddTaskObserver(TaskQueueId queue_id,
                                             intptr_t key,
                                             const std::function<void ()> &callback)
 {
-    std::lock_guard guard(queue_mutex_);
+    std::scoped_lock locker(queue_mutex_);
     WTF_DCHECK(callback != nullptr) << "Observer callback must be non-null.";
     queue_entries_.at(queue_id)->task_observers[key] = callback;
 }
 
-void MessageLoopTaskQueues::RemoveTaskObserver(TaskQueueId queue_id,
-                                               intptr_t key) {
-    std::lock_guard guard(queue_mutex_);
+void DelayedTaskQueues::RemoveTaskObserver(TaskQueueId queue_id,
+                                               intptr_t key)
+{
+    std::scoped_lock locker(queue_mutex_);
     queue_entries_.at(queue_id)->task_observers.erase(key);
 }
 
-TaskQueueId MessageLoopTaskQueues::CreateTaskQueue()
+TaskQueueId DelayedTaskQueues::CreateTaskQueue()
 {
     std::scoped_lock locker(queue_mutex_);
     TaskQueueId loop_id = TaskQueueId(task_queue_id_counter_);
@@ -54,7 +85,7 @@ TaskQueueId MessageLoopTaskQueues::CreateTaskQueue()
     return loop_id;
 }
 
-void MessageLoopTaskQueues::Dispose(TaskQueueId queue_id)
+void DelayedTaskQueues::Dispose(TaskQueueId queue_id)
 {
     std::scoped_lock locker(queue_mutex_);
     const auto &queue_entry = queue_entries_.at(queue_id);
@@ -65,17 +96,17 @@ void MessageLoopTaskQueues::Dispose(TaskQueueId queue_id)
     }
 }
 
-void MessageLoopTaskQueues::DisposeTasks(TaskQueueId queue_id)
+void DelayedTaskQueues::DisposeTasks(TaskQueueId queue_id)
 {
-    std::lock_guard guard(queue_mutex_);
+    std::scoped_lock locker(queue_mutex_);
     const auto &queue_entry = queue_entries_.at(queue_id);
-    queue_entry->delayed_task_queue = {};
+    queue_entry->Erase();
 }
 
-std::vector<std::function<void ()>> MessageLoopTaskQueues::GetObserversToNotify(
+std::vector<std::function<void ()>> DelayedTaskQueues::GetObserversToNotify(
         TaskQueueId queue_id) const
 {
-    std::lock_guard guard(queue_mutex_);
+    std::scoped_lock locker(queue_mutex_);
     std::vector<std::function<void ()>> observers;
 
     for (const auto &observer : queue_entries_.at(queue_id)->task_observers) {
@@ -85,10 +116,10 @@ std::vector<std::function<void ()>> MessageLoopTaskQueues::GetObserversToNotify(
     return observers;
 }
 
-std::function<void ()> MessageLoopTaskQueues::GetNextTaskToRun(TaskQueueId queue_id,
+std::function<void ()> DelayedTaskQueues::GetNextTaskToRun(TaskQueueId queue_id,
                                                   const std::chrono::steady_clock::time_point& from_time)
 {
-    std::lock_guard guard(queue_mutex_);
+    std::scoped_lock locker(queue_mutex_);
     if (!HasPendingTasks(queue_id)) {
         return nullptr;
     }
@@ -104,28 +135,28 @@ std::function<void ()> MessageLoopTaskQueues::GetNextTaskToRun(TaskQueueId queue
         return nullptr;
     }
     std::function<void ()> invocation = top_task.GetTask();
-    queue_entries_.at(queue_id)
-            ->delayed_task_queue.pop();
+    queue_entries_.at(queue_id)->Pop();
     return invocation;
 }
 
-std::chrono::steady_clock::time_point MessageLoopTaskQueues::GetNextWakeTimeUnlocked(
+std::chrono::steady_clock::time_point DelayedTaskQueues::GetNextWakeTimeUnlocked(
         TaskQueueId queue_id) const
 {
     return PeekNextTaskUnlocked(queue_id).GetTargetTime();
 }
 
-size_t MessageLoopTaskQueues::GetNumPendingTasks(TaskQueueId queue_id) const {
-    std::lock_guard guard(queue_mutex_);
+size_t DelayedTaskQueues::GetNumPendingTasks(TaskQueueId queue_id) const
+{
+    std::scoped_lock locker(queue_mutex_);
     const auto& queue_entry = queue_entries_.at(queue_id);
 
     size_t total_tasks = 0;
-    total_tasks += queue_entry->delayed_task_queue.size();
+    total_tasks += queue_entry->Size();
 
     return total_tasks;
 }
 
-bool MessageLoopTaskQueues::HasPendingTasks(
+bool DelayedTaskQueues::HasPendingTasks(
         TaskQueueId queue_id) const
 {
     const auto &entry = queue_entries_.at(queue_id);
@@ -134,27 +165,27 @@ bool MessageLoopTaskQueues::HasPendingTasks(
         return false;
     }
 
-    return !entry->delayed_task_queue.empty();
+    return !entry->IsEmpty();
 }
 
-wtf::DelayedTask MessageLoopTaskQueues::PeekNextTaskUnlocked(
+wtf::DelayedTask DelayedTaskQueues::PeekNextTaskUnlocked(
         TaskQueueId owner) const
 {
     WTF_DCHECK(HasPendingTasks(owner));
     const auto &entry = queue_entries_.at(owner);
 
-    return entry->delayed_task_queue.top();
+    return entry->Top();
 }
 
-void MessageLoopTaskQueues::RegisterTask(
+void DelayedTaskQueues::RegisterTask(
         TaskQueueId queue_id,
         const std::function<void ()> &task,
         const std::chrono::steady_clock::time_point& target_time)
 {
-    std::lock_guard guard(queue_mutex_);
+    std::scoped_lock locker(queue_mutex_);
     size_t order = order_++;
     const auto &queue_entry = queue_entries_.at(queue_id);
-    queue_entry->delayed_task_queue.push({order, task, target_time});
+    queue_entry->Push({order, task, target_time});
     TaskQueueId loop_to_wake = queue_id;
 
     if (HasPendingTasks(loop_to_wake)) {
@@ -162,16 +193,16 @@ void MessageLoopTaskQueues::RegisterTask(
     }
 }
 
-void MessageLoopTaskQueues::SetWakeable(TaskQueueId queue_id,
+void DelayedTaskQueues::SetWakeable(TaskQueueId queue_id,
                                         wtf::Wakeable *wakeable)
 {
-    std::lock_guard guard(queue_mutex_);
+    std::scoped_lock locker(queue_mutex_);
     WTF_CHECK(!queue_entries_.at(queue_id)->wakeable)
     << "Wakeable can only be set once.";
     queue_entries_.at(queue_id)->wakeable = wakeable;
 }
 
-void MessageLoopTaskQueues::WakeUpUnlocked(TaskQueueId queue_id,
+void DelayedTaskQueues::WakeUpUnlocked(TaskQueueId queue_id,
                                            const std::chrono::steady_clock::time_point& time) const
 {
     if (queue_entries_.at(queue_id)->wakeable) {

@@ -2,8 +2,8 @@
 // Created by guozhenxiong on 2021-07-02.
 //
 
-#ifndef TASKRUNNER_MESSAGE_LOOP_TASK_QUEUES_H
-#define TASKRUNNER_MESSAGE_LOOP_TASK_QUEUES_H
+#ifndef TASKRUNNER_DELAYED_TASK_QUEUES_H
+#define TASKRUNNER_DELAYED_TASK_QUEUES_H
 
 #include <map>
 #include <mutex>
@@ -20,21 +20,33 @@ public:
     using TaskObservers = std::map<intptr_t, std::function<void ()>>;
     Wakeable* wakeable;
     TaskObservers task_observers;
-    DelayedTaskQueue delayed_task_queue;
+
+    void Erase();
+
+    bool IsEmpty();
+
+    size_t Size();
+
+    void Pop();
+
+    void Push(const DelayedTask& task);
+
+    DelayedTask Top();
 
     TaskQueueId owner_of;
 
     explicit TaskQueueEntry(TaskQueueId owner_of);
 
 private:
+    DelayedTaskQueue task_queue_;
 
     WTF_DISALLOW_COPY_ASSIGN_AND_MOVE(TaskQueueEntry);
 };
 
-class MessageLoopTaskQueues : public TaskQueues {
+class DelayedTaskQueues : public TaskQueues {
 public:
 
-    static MessageLoopTaskQueues* GetInstance();
+    static DelayedTaskQueues* GetInstance();
 
     TaskQueueId CreateTaskQueue();
 
@@ -64,9 +76,9 @@ public:
 
 private:
 
-    MessageLoopTaskQueues() = default;
+    DelayedTaskQueues() = default;
 
-    ~MessageLoopTaskQueues();
+    ~DelayedTaskQueues();
 
     void WakeUpUnlocked(TaskQueueId queue_id, const std::chrono::steady_clock::time_point& time) const;
 
@@ -76,9 +88,9 @@ private:
 
     std::map<TaskQueueId, std::unique_ptr<TaskQueueEntry>> queue_entries_;
 
-    WTF_DISALLOW_COPY_ASSIGN_AND_MOVE(MessageLoopTaskQueues);
+    WTF_DISALLOW_COPY_ASSIGN_AND_MOVE(DelayedTaskQueues);
 
 };
 } // namespace wtf
 
-#endif //TASKRUNNER_MESSAGE_LOOP_TASK_QUEUES_H
+#endif //TASKRUNNER_DELAYED_TASK_QUEUES_H

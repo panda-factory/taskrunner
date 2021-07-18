@@ -7,7 +7,7 @@
 
 #include "wakeable.h"
 #include "task_queue_id.h"
-#include "message_loop_task_queues.h"
+#include "delayed_task_queues.h"
 #include "macros.h"
 #include "message_loop_impl.h"
 
@@ -47,7 +47,7 @@ protected:
     DelayedMessageLoopImpl();
 
 private:
-    MessageLoopTaskQueues* task_queue_;
+    DelayedTaskQueues* task_queue_;
 
     TaskQueueId queue_id_;
 

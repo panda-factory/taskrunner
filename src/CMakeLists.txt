@@ -8,7 +8,7 @@ SET(TASK_RUNNER_SRC
     delayed/delayed_message_loop_impl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/message_loop.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/message_loop_impl.cpp
-    delayed/message_loop_task_queues.cpp
+    delayed/delayed_task_queues.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/task_type.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/task_queues.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/task_runner.cpp

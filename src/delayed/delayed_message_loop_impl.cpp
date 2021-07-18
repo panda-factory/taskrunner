@@ -19,7 +19,7 @@ std::unique_ptr<DelayedMessageLoopImpl> DelayedMessageLoopImpl::Create()
 }
 
 DelayedMessageLoopImpl::DelayedMessageLoopImpl()
-        : task_queue_(MessageLoopTaskQueues::GetInstance()),
+        : task_queue_(DelayedTaskQueues::GetInstance()),
           queue_id_(task_queue_->CreateTaskQueue()),
           terminated_(false)
 {

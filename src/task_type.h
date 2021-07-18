@@ -20,14 +20,13 @@ public:
 
     const std::function<void()> &GetTask() const;
 
-private:
+protected:
     size_t order_;
-    std::function<void()> task_;
 
-    WTF_DISALLOW_COPY_ASSIGN_AND_MOVE(Task);
+    std::function<void()> task_;
 };
 
-class DelayedTask {
+class DelayedTask : public Task {
 public:
     DelayedTask(size_t order,
                 const std::function<void()> &task,
@@ -37,15 +36,11 @@ public:
 
     ~DelayedTask() = default;
 
-    const std::function<void()> &GetTask() const;
-
     std::chrono::steady_clock::time_point GetTargetTime() const;
 
     bool operator>(const DelayedTask &other) const;
 
 private:
-    size_t order_;
-    std::function<void()> task_;
     std::chrono::steady_clock::time_point target_time_;
 
 };
