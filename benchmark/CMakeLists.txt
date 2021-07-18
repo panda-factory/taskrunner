@@ -11,7 +11,7 @@ IF(BENCHMARK_FOUND)
     ADD_EXECUTABLE(task_runner_benchmark
         task_runner_benchmark.cpp)
     TARGET_INCLUDE_DIRECTORIES(task_runner_benchmark PRIVATE ${BENCHMARK_INCLUDE_DIR})
-    TARGET_LINK_LIBRARIES(task_runner_benchmark PRIVATE ${BENCHMARK_LIBRARIES})
+    TARGET_LINK_LIBRARIES(task_runner_benchmark PRIVATE ${BENCHMARK_LIBRARIES} taskrunner)
 ENDIF()
 
 
