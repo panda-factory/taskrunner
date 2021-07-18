@@ -74,7 +74,6 @@ void DelayedMessageLoopImpl::DoTerminate()
 
 void DelayedMessageLoopImpl::FlushTasks(FlushType type)
 {
-
     const auto now = std::chrono::steady_clock::now();
     std::function<void ()> invocation;
     do {
@@ -88,7 +87,7 @@ void DelayedMessageLoopImpl::FlushTasks(FlushType type)
         for (const auto &observer : observers) {
             observer();
         }
-        if (type == FlushType::Single) {
+        if (type == FlushType::kSingle) {
             break;
         }
     } while (invocation);
@@ -108,7 +107,7 @@ void DelayedMessageLoopImpl::PostTask(const std::function<void ()> &task,
 
 void DelayedMessageLoopImpl::RunExpiredTasksNow()
 {
-    FlushTasks(FlushType::All);
+    FlushTasks(FlushType::kAll);
 }
 
 TaskQueueId DelayedMessageLoopImpl::GetTaskQueueId() const

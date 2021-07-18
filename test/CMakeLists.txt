@@ -15,11 +15,13 @@ IF(GTESTSRC_FOUND)
     ADD_SUBDIRECTORY(${GTEST_SOURCE_DIR} ${CMAKE_BINARY_DIR}/third-party/googletest)
     SET(GTEST_LIBRARIES gtest gtest_main)
 
+    INCLUDE_DIRECTORIES(${PROJECT_ROOT_PATH}/src)
     INCLUDE_DIRECTORIES(${PROJECT_ROOT_PATH}/include)
     INCLUDE_DIRECTORIES(${PROJECT_ROOT_PATH}/third-party/timepoint/include)
     ADD_EXECUTABLE(unittests
         delayed_task_runner_unittests.cpp
         concurrent_task_runner_unittests.cpp
+        task_queue_unittest.cpp
         task_runner_unittests.cpp)
     TARGET_LINK_LIBRARIES(unittests PRIVATE ${GTEST_LIBRARIES} taskrunner)
     IF(BUILDING_SHARED)

@@ -14,7 +14,7 @@
 namespace wtf {
 class MessageLoopImpl;
 
-class TaskRunner {
+class WTF_DLL TaskRunner {
 public:
     static std::unique_ptr<TaskRunner> Create(const std::string& task_name = "");
 
@@ -28,21 +28,21 @@ public:
 
     virtual void Terminate();
 
-    TaskRunner();
-
     virtual ~TaskRunner();
 
 protected:
     static void TaskRunner::SetCurrentThreadName(const std::string& name);
 
+    TaskRunner();
+
     std::unique_ptr<std::thread> thread_;
 
     std::atomic_bool joined_;
 
-    std::atomic_bool terminated_;
+    std::atomic_bool terminated_; // loop_ cannot be used when terminated value to false.
 
 private:
-    wtf::MessageLoopImpl* loop_;
+    wtf::MessageLoopImpl* loop_; // dont used shared_ptr for performance considered.
 };
 
 

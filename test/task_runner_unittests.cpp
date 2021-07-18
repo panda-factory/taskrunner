@@ -10,3 +10,34 @@ TEST(TaskRunner, CreateAndTerminate)
     auto task_runner = wtf::TaskRunner::Create("aaa");
     ASSERT_NE(task_runner.get(), nullptr);
 }
+
+TEST(TaskRunner, CanRunAndTerminate)
+{
+    bool started = false;
+    auto task_runner = wtf::TaskRunner::Create();
+    ASSERT_NE(task_runner.get(), nullptr);
+
+    task_runner->PostTask([&started]() {
+        started = true;
+    });
+    task_runner->Terminate();
+    task_runner->Join();
+    ASSERT_TRUE(started);
+}
+
+TEST(TaskRunner, NonDelayedTasksAreRunInOrder)
+{
+    const size_t count = 100;
+    size_t current = 0;
+    auto task_runner = wtf::TaskRunner::Create();
+
+    for (size_t i = 0; i < count; i++) {
+        task_runner->PostTask([i, &current]() {
+            ASSERT_EQ(current, i);
+            current++;
+        });
+    }
+    task_runner->Terminate();
+    task_runner->Join();
+    ASSERT_EQ(current, count);
+}

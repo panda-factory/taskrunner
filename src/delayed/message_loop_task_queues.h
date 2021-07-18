@@ -88,8 +88,8 @@ private:
 
 };
 enum class FlushType {
-    Single,
-    All,
+    kSingle,
+    kAll,
 };
 } // namespace wtf
 

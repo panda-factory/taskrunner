@@ -13,6 +13,7 @@ void MessageLoop::EnsureInitializedForCurrentThread(std::unique_ptr<MessageLoop>
     if (tls_message_loop.get() != nullptr) {
         return;
     }
+
     if (loop) {
         tls_message_loop = std::move(loop);
     } else {

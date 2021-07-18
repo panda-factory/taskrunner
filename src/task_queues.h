@@ -11,15 +11,18 @@
 #include <map>
 
 #include "task_queue_id.h"
+#include "wakeable.h"
 
 namespace wtf {
 class TaskQueue {
 public:
-    TaskQueue(TaskQueueId queue_id) : owner_of(queue_id) {};
+    TaskQueue(TaskQueueId queue_id);
 
     using TaskObservers = std::map<intptr_t, std::function<void ()>>;
 
     TaskObservers task_observers;
+
+    Wakeable* wakeable;
 
     TaskQueueId owner_of;
 
@@ -34,6 +37,12 @@ public:
                          intptr_t key,
                          const std::function<void ()>& callback);
 
+    std::vector<std::function<void ()>> GetObserversToNotify(TaskQueueId queue_id) const;
+
+    bool TaskQueues::HasPendingTasks(TaskQueueId queue_id) const;
+
+    size_t GetNumPendingTasks(TaskQueueId queue_id) const;
+
     void RemoveTaskObserver(TaskQueueId queue_id, intptr_t key);
 
     TaskQueueId CreateTaskQueue();
@@ -43,7 +52,11 @@ public:
     void RegisterTask(TaskQueueId queue_id,
                       const std::function<void ()>& task);
 
+    virtual void SetWakeable(TaskQueueId queue_id, wtf::Wakeable *wakeable);
+
 private:
+
+    void WakeUpUnlocked(TaskQueueId queue_id, const std::chrono::steady_clock::time_point& time) const;
 
     mutable std::mutex queue_mutex_;
 

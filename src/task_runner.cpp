@@ -31,7 +31,8 @@ typedef struct tagTHREADNAME_INFO {
 // | static |
 std::unique_ptr<TaskRunner> TaskRunner::Create(const std::string& task_name)
 {
-    auto task_runner = std::make_unique<TaskRunner>();
+    std::unique_ptr<TaskRunner> task_runner;
+    task_runner.reset(new TaskRunner());
     std::promise<wtf::MessageLoopImpl*> message_loop_promise;
     auto message_loop_future = message_loop_promise.get_future();
 

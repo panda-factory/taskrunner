@@ -14,6 +14,12 @@ MessageLoopImpl::MessageLoopImpl() :
         queue_id_(task_queues_->CreateTaskQueue()),
         terminated_(false)
 {
+    task_queues_->SetWakeable(queue_id_, this);
+}
+
+MessageLoopImpl::MessageLoopImpl(wtf::Wakeable *wakeable)
+{
+    task_queues_->SetWakeable(queue_id_, wakeable);
 }
 
 MessageLoopImpl::~MessageLoopImpl()
@@ -35,6 +41,26 @@ void MessageLoopImpl::AddTaskObserver(intptr_t key,
     }
 }
 
+void MessageLoopImpl::FlushTasks(FlushType type)
+{
+    std::function<void ()> invoker;
+    do {
+        invoker = task_queues_->GetNextTask(queue_id_);
+        if (!invoker) {
+            break;
+        }
+        invoker();
+        std::vector<std::function<void ()>> observers =
+                task_queues_->GetObserversToNotify(queue_id_);
+        for (const auto &observer : observers) {
+            observer();
+        }
+        if (type == FlushType::kSingle) {
+            break;
+        }
+    } while (invoker);
+}
+
 void MessageLoopImpl::RemoveTaskObserver(intptr_t key) {
     WTF_DCHECK(MessageLoop::GetCurrent().GetLoopImpl() == this)
     << "Message loop task observer must be removed from the same thread as "
@@ -52,8 +78,6 @@ void MessageLoopImpl::PostTask(const std::function<void ()>& task,
         return;
     }
     task_queues_->RegisterTask(queue_id_, task);
-
-    task_condition_.notify_one();
 }
 
 void MessageLoopImpl::DoRun()
@@ -66,20 +90,18 @@ void MessageLoopImpl::DoRun()
     terminated_ = true;
 }
 
-void MessageLoopImpl::Terminate()
-{
-}
-
 void MessageLoopImpl::Run()
 {
     while (!terminated_) {
         std::unique_lock lock(task_mutex_);
         task_condition_.wait(lock);
 
-        std::function<void ()> task = task_queues_->GetNextTask(queue_id_);
-
-        task();
+        FlushTasks(FlushType::kAll);
     }
+}
+
+void MessageLoopImpl::Terminate()
+{
 }
 
 void MessageLoopImpl::DoTerminate()
@@ -87,4 +109,11 @@ void MessageLoopImpl::DoTerminate()
     terminated_ = true;
     Terminate();
 }
+
+
+void MessageLoopImpl::WakeUp(const std::chrono::steady_clock::time_point& time_point)
+{
+    task_condition_.notify_one();
+}
+
 } // namespace wtf

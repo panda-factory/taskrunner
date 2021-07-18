@@ -15,15 +15,19 @@ public:
     static std::shared_ptr<ConcurrentTaskRunner> Create(
             size_t worker_count = std::thread::hardware_concurrency());
 
-
-    void AddTaskObserver(intptr_t key, const std::function<void ()>& callback);
-
-    void RemoveTaskObserver(intptr_t key);
-
+    // | TaskRunner |
     void PostTask(const std::function<void ()>& task) override;
 
+    // | TaskRunner |
+    void AddTaskObserver(intptr_t key, const std::function<void ()>& callback) override;
+
+    // | TaskRunner |
+    void RemoveTaskObserver(intptr_t key) override;
+
+    // | TaskRunner |
     void Join() override;
 
+    // | TaskRunner |
     void Terminate() override;
 
     void PostTaskToAllWorkers(const std::function<void ()>& task);

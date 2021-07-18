@@ -23,12 +23,14 @@
 
 namespace wtf {
 
-class MessageLoopImpl {
+class MessageLoopImpl : public Wakeable {
 public:
 
     virtual void AddTaskObserver(intptr_t key, const std::function<void ()>& callback);
 
     virtual void RemoveTaskObserver(intptr_t key);
+
+    void FlushTasks(FlushType type);
 
     virtual void Run();
 
@@ -41,7 +43,12 @@ public:
 
     virtual void DoRun();
 
+    // | Wakeable |
+    virtual void WakeUp(const std::chrono::steady_clock::time_point& time_point);
+
     MessageLoopImpl();
+
+    MessageLoopImpl(wtf::Wakeable *wakeable);
 
     ~MessageLoopImpl();
 

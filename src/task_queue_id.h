@@ -11,6 +11,8 @@ class TaskQueueId {
 public:
     static const size_t unmerged;
 
+    TaskQueueId() = default;
+
     explicit TaskQueueId(size_t value) : value_(value) {}
 
     operator size_t() const { return value_; }
