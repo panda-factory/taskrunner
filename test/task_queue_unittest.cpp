@@ -34,6 +34,34 @@ TEST(TaskQueues, RegisterOneTask)
     ASSERT_TRUE(task_queue->GetNumPendingTasks(queue_id) == 1);
 }
 
+TEST(TaskQueues, RegisterOneTaskThenDispose)
+{
+    auto task_queue = wtf::TaskQueues::GetInstance();
+    auto queue_id = task_queue->CreateTaskQueue();
+
+    task_queue->RegisterTask(queue_id, [] {});
+    ASSERT_TRUE(task_queue->HasPendingTasks(queue_id));
+    ASSERT_TRUE(task_queue->GetNumPendingTasks(queue_id) == 1);
+
+    task_queue->Dispose(queue_id);
+    ASSERT_FALSE(task_queue->HasPendingTasks(queue_id));
+    ASSERT_TRUE(task_queue->GetNumPendingTasks(queue_id) == 0);
+}
+
+TEST(TaskQueues, RegisterOneTaskThenDisposeTasks)
+{
+    auto task_queue = wtf::TaskQueues::GetInstance();
+    auto queue_id = task_queue->CreateTaskQueue();
+
+    task_queue->RegisterTask(queue_id, [] {});
+    ASSERT_TRUE(task_queue->HasPendingTasks(queue_id));
+    ASSERT_TRUE(task_queue->GetNumPendingTasks(queue_id) == 1);
+
+    task_queue->DisposeTasks(queue_id);
+    ASSERT_FALSE(task_queue->HasPendingTasks(queue_id));
+    ASSERT_TRUE(task_queue->GetNumPendingTasks(queue_id) == 0);
+}
+
 TEST(TaskQueues, RegisterTwoTasksAndCount) {
     auto task_queue = wtf::TaskQueues::GetInstance();
     auto queue_id = task_queue->CreateTaskQueue();

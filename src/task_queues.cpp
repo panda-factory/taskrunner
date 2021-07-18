@@ -48,11 +48,6 @@ void TaskQueues::DisposeTasks(TaskQueueId queue_id)
     task_queues_impl_->DisposeTasks(queue_id);
 }
 
-std::vector<std::function<void()>> TaskQueues::GetObserversToNotify(TaskQueueId queue_id) const
-{
-    return task_queues_impl_->GetObserversToNotify(queue_id);
-}
-
 bool TaskQueues::HasPendingTasks(TaskQueueId queue_id) const
 {
     return task_queues_impl_->HasPendingTasks(queue_id);
@@ -82,17 +77,14 @@ void TaskQueues::RemoveTaskObserver(TaskQueueId queue_id,
     task_queues_impl_->RemoveTaskObserver(queue_id, key);
 }
 
+std::vector<std::function<void()>> TaskQueues::GetObserversToNotify(TaskQueueId queue_id) const
+{
+    return task_queues_impl_->GetObserversToNotify(queue_id);
+}
+
 void TaskQueues::SetWakeable(TaskQueueId queue_id, wtf::Wakeable *wakeable)
 {
     task_queues_impl_->SetWakeable(queue_id, wakeable);
-}
-
-void TaskQueues::WakeUpUnlocked(TaskQueueId queue_id,
-                                const std::chrono::steady_clock::time_point &time) const
-{
-    if (queue_entries_.at(queue_id)->wakeable) {
-        queue_entries_.at(queue_id)->wakeable->WakeUp(time);
-    }
 }
 
 } // namespace wtf
