@@ -48,6 +48,20 @@ std::function<void ()> TaskQueues::GetNextTask(TaskQueueId queue_id)
     return task;
 }
 
+void TaskQueues::Dispose(TaskQueueId queue_id)
+{
+    std::scoped_lock locker(queue_mutex_);
+    const auto &queue_entry = queue_entries_.at(queue_id);
+    queue_entries_.erase(queue_id);
+}
+
+void TaskQueues::DisposeTasks(TaskQueueId queue_id)
+{
+    std::lock_guard guard(queue_mutex_);
+    const auto &queue_entry = queue_entries_.at(queue_id);
+    queue_entry->task_queue = {};
+}
+
 std::vector<std::function<void ()>> TaskQueues::GetObserversToNotify(TaskQueueId queue_id) const
 {
     std::lock_guard guard(queue_mutex_);

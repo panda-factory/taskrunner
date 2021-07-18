@@ -10,7 +10,7 @@
 
 #include "task_type.h"
 #include "task_queue_id.h"
-#include "wakeable.h"
+#include "task_queues.h"
 #include "macros.h"
 
 namespace wtf {
@@ -31,7 +31,7 @@ private:
     WTF_DISALLOW_COPY_ASSIGN_AND_MOVE(TaskQueueEntry);
 };
 
-class MessageLoopTaskQueues {
+class MessageLoopTaskQueues : public TaskQueues {
 public:
 
     static MessageLoopTaskQueues* GetInstance();
@@ -46,11 +46,11 @@ public:
                       const std::function<void ()>& task,
                       const std::chrono::steady_clock::time_point& target_time);
 
-    bool HasPendingTasks(TaskQueueId queue_id) const;
-
     std::function<void ()> GetNextTaskToRun(TaskQueueId queue_id, const std::chrono::steady_clock::time_point& from_time);
 
-    size_t GetNumPendingTasks(TaskQueueId queue_id) const;
+    size_t GetNumPendingTasks(TaskQueueId queue_id) const override;
+
+    bool HasPendingTasks(TaskQueueId queue_id) const override;
 
     void AddTaskObserver(TaskQueueId queue_id,
                          intptr_t key,
@@ -70,26 +70,14 @@ private:
 
     void WakeUpUnlocked(TaskQueueId queue_id, const std::chrono::steady_clock::time_point& time) const;
 
-    bool HasPendingTasksUnlocked(TaskQueueId queue_id) const;
-
     wtf::DelayedTask PeekNextTaskUnlocked(TaskQueueId owner) const;
 
     std::chrono::steady_clock::time_point GetNextWakeTimeUnlocked(TaskQueueId queue_id) const;
 
-    mutable std::mutex queue_mutex_;
-
     std::map<TaskQueueId, std::unique_ptr<TaskQueueEntry>> queue_entries_;
-
-    size_t task_queue_id_counter_ = 0;
-
-    std::atomic_int order_ = 0;
 
     WTF_DISALLOW_COPY_ASSIGN_AND_MOVE(MessageLoopTaskQueues);
 
-};
-enum class FlushType {
-    kSingle,
-    kAll,
 };
 } // namespace wtf
 

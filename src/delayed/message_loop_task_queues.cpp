@@ -89,12 +89,12 @@ std::function<void ()> MessageLoopTaskQueues::GetNextTaskToRun(TaskQueueId queue
                                                   const std::chrono::steady_clock::time_point& from_time)
 {
     std::lock_guard guard(queue_mutex_);
-    if (!HasPendingTasksUnlocked(queue_id)) {
+    if (!HasPendingTasks(queue_id)) {
         return nullptr;
     }
     wtf::DelayedTask top_task = PeekNextTaskUnlocked(queue_id);
 
-    if (!HasPendingTasksUnlocked(queue_id)) {
+    if (!HasPendingTasks(queue_id)) {
         WakeUpUnlocked(queue_id, std::chrono::steady_clock::time_point::max());
     } else {
         WakeUpUnlocked(queue_id, GetNextWakeTimeUnlocked(queue_id));
@@ -115,7 +115,17 @@ std::chrono::steady_clock::time_point MessageLoopTaskQueues::GetNextWakeTimeUnlo
     return PeekNextTaskUnlocked(queue_id).GetTargetTime();
 }
 
-bool MessageLoopTaskQueues::HasPendingTasksUnlocked(
+size_t MessageLoopTaskQueues::GetNumPendingTasks(TaskQueueId queue_id) const {
+    std::lock_guard guard(queue_mutex_);
+    const auto& queue_entry = queue_entries_.at(queue_id);
+
+    size_t total_tasks = 0;
+    total_tasks += queue_entry->delayed_task_queue.size();
+
+    return total_tasks;
+}
+
+bool MessageLoopTaskQueues::HasPendingTasks(
         TaskQueueId queue_id) const
 {
     const auto &entry = queue_entries_.at(queue_id);
@@ -130,7 +140,7 @@ bool MessageLoopTaskQueues::HasPendingTasksUnlocked(
 wtf::DelayedTask MessageLoopTaskQueues::PeekNextTaskUnlocked(
         TaskQueueId owner) const
 {
-    WTF_DCHECK(HasPendingTasksUnlocked(owner));
+    WTF_DCHECK(HasPendingTasks(owner));
     const auto &entry = queue_entries_.at(owner);
 
     return entry->delayed_task_queue.top();
@@ -147,7 +157,7 @@ void MessageLoopTaskQueues::RegisterTask(
     queue_entry->delayed_task_queue.push({order, task, target_time});
     TaskQueueId loop_to_wake = queue_id;
 
-    if (HasPendingTasksUnlocked(loop_to_wake)) {
+    if (HasPendingTasks(loop_to_wake)) {
         WakeUpUnlocked(loop_to_wake, GetNextWakeTimeUnlocked(loop_to_wake));
     }
 }
