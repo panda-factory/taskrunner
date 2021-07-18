@@ -13,6 +13,7 @@
 #include "task_queue_id.h"
 #include "task_queues_impl.h"
 #include "wakeable.h"
+#include "task_type.h"
 
 namespace wtf {
 class TaskQueue {
@@ -27,7 +28,7 @@ public:
 
     TaskQueueId owner_of;
 
-    std::queue<std::function<void ()>> task_queue;
+    std::queue<Task> task_queue;
 };
 
 class TaskQueues {

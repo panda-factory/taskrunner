@@ -15,6 +15,7 @@ void MessageLoop::EnsureInitializedForCurrentThread(std::unique_ptr<MessageLoop>
     }
 
     if (loop) {
+        // Initiate tls message_loop for sub-class message_loop.
         tls_message_loop = std::move(loop);
     } else {
         tls_message_loop.reset(new MessageLoop());

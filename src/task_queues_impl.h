@@ -44,14 +44,14 @@ public:
 
     virtual void SetWakeable(TaskQueueId queue_id, wtf::Wakeable *wakeable);
 
+    TaskQueuesImpl();
+
 protected:
     size_t task_queue_id_counter_ = 0;
 
     mutable std::mutex queue_mutex_;
 
     std::atomic_int order_ = 0;
-
-    std::unique_ptr<TaskQueuesImpl> task_queues_;
 
 private:
     void WakeUpUnlocked(TaskQueueId queue_id, const std::chrono::steady_clock::time_point& time) const;

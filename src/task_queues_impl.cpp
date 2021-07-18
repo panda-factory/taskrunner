@@ -9,6 +9,10 @@
 
 namespace wtf {
 
+TaskQueuesImpl::TaskQueuesImpl()
+    : task_queue_id_counter_(0), order_(0)
+{}
+
 TaskQueueId TaskQueuesImpl::CreateTaskQueue()
 {
     std::scoped_lock locker(queue_mutex_);
@@ -25,13 +29,12 @@ std::function<void ()> TaskQueuesImpl::GetNextTask(TaskQueueId queue_id)
         return nullptr;
     }
 
-    size_t order = order_++;
     const auto &queue_entry = queue_entries_.at(queue_id);
 
     auto task = queue_entry->task_queue.front();
     queue_entry->task_queue.pop();
 
-    return task;
+    return task.GetTask();
 }
 
 void TaskQueuesImpl::Dispose(TaskQueueId queue_id)
@@ -83,7 +86,7 @@ void TaskQueuesImpl::RegisterTask(TaskQueueId queue_id,
     std::lock_guard guard(queue_mutex_);
     size_t order = order_++;
     const auto &queue_entry = queue_entries_.at(queue_id);
-    queue_entry->task_queue.push(task);
+    queue_entry->task_queue.push({order, task});
 
     if (HasPendingTasks(queue_id)) {
         WakeUpUnlocked(queue_id, std::chrono::steady_clock::time_point::max());
