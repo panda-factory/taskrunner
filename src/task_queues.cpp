@@ -16,119 +16,79 @@ TaskQueue::TaskQueue(TaskQueueId owner_of)
 }
 
 TaskQueues *TaskQueues::GetInstance()
-{    static TaskQueues *instance = nullptr;
+{
+    static TaskQueues *instance = nullptr;
     if (!instance) {
-        instance = new TaskQueues();
+        instance = new TaskQueues(std::make_unique<TaskQueuesImpl>());
     }
     return instance;
 }
 
+TaskQueues::TaskQueues(std::unique_ptr<TaskQueuesImpl> task_queues)
+        : task_queues_impl_(std::move(task_queues))
+{}
+
 TaskQueueId TaskQueues::CreateTaskQueue()
 {
-    std::scoped_lock locker(queue_mutex_);
-    TaskQueueId loop_id = TaskQueueId(task_queue_id_counter_);
-    ++task_queue_id_counter_;
-    queue_entries_[loop_id] = std::make_unique<TaskQueue>(loop_id);
-    return loop_id;
+    return task_queues_impl_->CreateTaskQueue();
 }
 
-std::function<void ()> TaskQueues::GetNextTask(TaskQueueId queue_id)
+std::function<void()> TaskQueues::GetNextTask(TaskQueueId queue_id)
 {
-    std::lock_guard guard(queue_mutex_);
-    if (!HasPendingTasks(queue_id)) {
-        return nullptr;
-    }
-
-    size_t order = order_++;
-    const auto &queue_entry = queue_entries_.at(queue_id);
-
-    auto task = queue_entry->task_queue.front();
-    queue_entry->task_queue.pop();
-
-    return task;
+    return task_queues_impl_->GetNextTask(queue_id);
 }
 
 void TaskQueues::Dispose(TaskQueueId queue_id)
 {
-    std::scoped_lock locker(queue_mutex_);
-    const auto &queue_entry = queue_entries_.at(queue_id);
-    queue_entries_.erase(queue_id);
+    task_queues_impl_->Dispose(queue_id);
 }
 
 void TaskQueues::DisposeTasks(TaskQueueId queue_id)
 {
-    std::lock_guard guard(queue_mutex_);
-    const auto &queue_entry = queue_entries_.at(queue_id);
-    queue_entry->task_queue = {};
+    task_queues_impl_->DisposeTasks(queue_id);
 }
 
-std::vector<std::function<void ()>> TaskQueues::GetObserversToNotify(TaskQueueId queue_id) const
+std::vector<std::function<void()>> TaskQueues::GetObserversToNotify(TaskQueueId queue_id) const
 {
-    std::lock_guard guard(queue_mutex_);
-    std::vector<std::function<void ()>> observers;
-
-    for (const auto &observer : queue_entries_.at(queue_id)->task_observers) {
-        observers.push_back(observer.second);
-    }
-
-    return observers;
+    return task_queues_impl_->GetObserversToNotify(queue_id);
 }
 
 bool TaskQueues::HasPendingTasks(TaskQueueId queue_id) const
 {
-    const auto &entry = queue_entries_.at(queue_id);
-
-    return !entry->task_queue.empty();
+    return task_queues_impl_->HasPendingTasks(queue_id);
 }
 
-size_t TaskQueues::GetNumPendingTasks(TaskQueueId queue_id) const {
-    std::lock_guard guard(queue_mutex_);
-    const auto& queue_entry = queue_entries_.at(queue_id);
-
-    size_t total_tasks = 0;
-    total_tasks += queue_entry->task_queue.size();
-
-    return total_tasks;
-}
-
-void TaskQueues::RegisterTask(TaskQueueId queue_id,
-                              const std::function<void ()>& task)
+size_t TaskQueues::GetNumPendingTasks(TaskQueueId queue_id) const
 {
-    std::lock_guard guard(queue_mutex_);
-    size_t order = order_++;
-    const auto &queue_entry = queue_entries_.at(queue_id);
-    queue_entry->task_queue.push(task);
+    return task_queues_impl_->GetNumPendingTasks(queue_id);
+}
 
-    if (HasPendingTasks(queue_id)) {
-        WakeUpUnlocked(queue_id, std::chrono::steady_clock::time_point::max());
-    }
+void TaskQueues::RegisterTask(const TaskQueueId &queue_id,
+                              const std::function<void()> &task)
+{
+    task_queues_impl_->RegisterTask(queue_id, task);
 }
 
 void TaskQueues::AddTaskObserver(TaskQueueId queue_id,
                                  intptr_t key,
-                                 const std::function<void ()> &callback)
+                                 const std::function<void()> &callback)
 {
-    std::lock_guard guard(queue_mutex_);
-    WTF_DCHECK(callback != nullptr) << "Observer callback must be non-null.";
-    queue_entries_.at(queue_id)->task_observers[key] = callback;
+    task_queues_impl_->AddTaskObserver(queue_id, key, callback);
 }
 
 void TaskQueues::RemoveTaskObserver(TaskQueueId queue_id,
-                                               intptr_t key) {
-    std::lock_guard guard(queue_mutex_);
-    queue_entries_.at(queue_id)->task_observers.erase(key);
+                                    intptr_t key)
+{
+    task_queues_impl_->RemoveTaskObserver(queue_id, key);
 }
 
 void TaskQueues::SetWakeable(TaskQueueId queue_id, wtf::Wakeable *wakeable)
 {
-    std::lock_guard guard(queue_mutex_);
-    WTF_CHECK(!queue_entries_.at(queue_id)->wakeable)
-        << "Wakeable can only be set once.";
-    queue_entries_.at(queue_id)->wakeable = wakeable;
+    task_queues_impl_->SetWakeable(queue_id, wakeable);
 }
 
 void TaskQueues::WakeUpUnlocked(TaskQueueId queue_id,
-                                           const std::chrono::steady_clock::time_point& time) const
+                                const std::chrono::steady_clock::time_point &time) const
 {
     if (queue_entries_.at(queue_id)->wakeable) {
         queue_entries_.at(queue_id)->wakeable->WakeUp(time);

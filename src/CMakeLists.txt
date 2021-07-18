@@ -11,6 +11,7 @@ SET(TASK_RUNNER_SRC
     delayed/delayed_task_queues.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/task_type.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/task_queues.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/task_queues_impl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/task_runner.cpp
     )
 

@@ -43,7 +43,7 @@ private:
     WTF_DISALLOW_COPY_ASSIGN_AND_MOVE(TaskQueueEntry);
 };
 
-class DelayedTaskQueues : public TaskQueues {
+class DelayedTaskQueues : public TaskQueuesImpl {
 public:
 
     static DelayedTaskQueues* GetInstance();
