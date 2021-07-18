@@ -15,9 +15,10 @@ TaskQueue::TaskQueue(TaskQueueId owner_of)
     task_observers = TaskObservers();
 }
 
+// | static |
 TaskQueues *TaskQueues::GetInstance()
 {
-    static TaskQueues *instance = nullptr;
+    static TaskQueues* instance = nullptr;
     if (!instance) {
         instance = new TaskQueues(std::make_unique<TaskQueuesImpl>());
     }

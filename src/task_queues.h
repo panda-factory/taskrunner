@@ -64,9 +64,8 @@ public:
 
     virtual void SetWakeable(TaskQueueId queue_id, wtf::Wakeable *wakeable);
 
+protected:
     TaskQueues(std::unique_ptr<TaskQueuesImpl> task_queues);
-
-private:
 
     std::unique_ptr<TaskQueuesImpl> task_queues_impl_;
 };
