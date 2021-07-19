@@ -8,33 +8,49 @@
 
 #include "task_runner/task_runner.h"
 #include "task_runner/delayed_task_runner.h"
-void foo()
-{
-    ;
-}
+#include "task_runner/concurrent_task_runner.h"
 
-static void BM_TASK_RUNNER(benchmark::State& state) {  // NOLINT
-    auto task_runner = wtf::TaskRunner::Create("task-runner");
-    std::atomic_int count = 0;
-    for (auto _ : state) {
-        // This code gets timed
-        task_runner->PostTask([&count]() {
-            count++;
+constexpr size_t kTotalCount = 10000;
+
+void PostTask(wtf::TaskRunner* task_runner, size_t& current)
+{
+
+    for (size_t i = 0; i < kTotalCount; i++) {
+        task_runner->PostTask([&current]() {
+            current++;
         });
     }
 }
-static void BM_DELAYED_TASK_RUNNER(benchmark::State& state) {  // NOLINT
-    auto task_runner = wtf::DelayedTaskRunner::CreateTaskRunner("delayed-task-runner");
-    std::atomic_int count = 0;
+
+static void BM_TaskRunner(benchmark::State& state) {  // NOLINT
+    size_t current = 0;
+    auto task_runner = wtf::TaskRunner::Create("task-runner");
     for (auto _ : state) {
         // This code gets timed
-        task_runner->PostTask([&count]() {
-            count++;
-        });
+        PostTask(task_runner.get(), current);
+    }
+}
+
+static void BM_DelayedTaskRunner(benchmark::State& state) {  // NOLINT
+    size_t current = 0;
+    auto task_runner = wtf::DelayedTaskRunner::CreateTaskRunner("delayed-task-runner");
+    for (auto _ : state) {
+        // This code gets timed
+        PostTask(task_runner.get(), current);
+    }
+}
+
+static void BM_ConcurrentTaskRunner(benchmark::State& state) {  // NOLINT
+    size_t current = 0;
+    auto task_runner = wtf::ConcurrentTaskRunner::Create();
+    for (auto _ : state) {
+        // This code gets timed
+        PostTask(task_runner.get(), current);
     }
 }
 
 // Run the benchmark
-BENCHMARK(BM_TASK_RUNNER);
-BENCHMARK(BM_DELAYED_TASK_RUNNER);
+BENCHMARK(BM_TaskRunner);
+BENCHMARK(BM_DelayedTaskRunner);
+BENCHMARK(BM_ConcurrentTaskRunner);
 BENCHMARK_MAIN();
