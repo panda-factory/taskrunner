@@ -43,6 +43,28 @@ TEST(DelayedTaskRunner, NonDelayedTasksAreRunInOrder)
     ASSERT_EQ(current, count);
 }
 
+static void PostTask(wtf::TaskRunner *task_runner, size_t &current, size_t& i)
+{
+    task_runner->PostTask([i, &current]() {
+        ASSERT_EQ(current, i);
+        current++;
+    });
+}
+
+TEST(DelayedTaskRunner, NonDelayedTasksAreRunInOrderUsedTaskRunnerPtr)
+{
+    const size_t count = 100;
+    size_t current = 0;
+    auto task_runner = wtf::DelayedTaskRunner::Create();
+
+    for (size_t i = 0; i < count; i++) {
+        PostTask(task_runner.get(), current, i);
+    }
+    task_runner->Terminate();
+    task_runner->Join();
+    ASSERT_EQ(current, count);
+}
+
 TEST(DelayedTaskRunner, DelayedTasksAtSameTimeAreRunInOrder)
 {
     const size_t count = 100;

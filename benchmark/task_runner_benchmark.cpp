@@ -14,7 +14,6 @@ constexpr size_t kTotalCount = 10000;
 
 void PostTask(wtf::TaskRunner* task_runner, size_t& current)
 {
-
     for (size_t i = 0; i < kTotalCount; i++) {
         task_runner->PostTask([&current]() {
             current++;
